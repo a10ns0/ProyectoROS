@@ -2,7 +2,7 @@
  Proyecto Sensor SICK Deteccion de distancia
  
 Autores: 
-**Cristobal
+**Cristobal Farías
 **Alonso Castillo Pinto
  
 ## Proyecto: Sistema de Asistencia al Posicionamiento de Camiones con SICK LMS251 y ROS2
