@@ -21,7 +21,8 @@ El objetivo es asistir en el posicionamiento de camiones mediante lógica de zon
 
 ## Estructura del Proyecto
 
-<img width="472" height="164" alt="image" src="https://github.com/user-attachments/assets/6a996eda-8da9-4625-ad73-715e62aa9a74" />
+<img width="887" height="329" alt="image" src="https://github.com/user-attachments/assets/765e09d9-b9c3-4f1e-bc17-50ba1c88ca23" />
+
 
 ---
 
