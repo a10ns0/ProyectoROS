@@ -6,11 +6,11 @@ Autores: Cristobal
  
 ## Proyecto: Sistema de Asistencia al Posicionamiento de Camiones con SICK LMS251 y ROS2
 
-## 📌 Descripción
+##  Descripción
 Este proyecto implementa un sistema de detección de distancia y evaluación de campos (bloques) utilizando el sensor **SICK LMS251** integrado en **ROS2**.  
 El objetivo es asistir en el posicionamiento de camiones mediante lógica de zonas de seguridad (STOP / Aproximación) y retroalimentación visual en **RViz2**.
 
-## 🛠️ Tecnologías
+##  Tecnologías
 - **Hardware:** Sensor LiDAR SICK LMS251
 - **Software:** ROS2 (Humble/Foxy), SOPAS ET, RViz2
 - **Driver:** [`sick_scan_xd`](https://github.com/SICKAG/sick_scan_xd)
@@ -18,7 +18,7 @@ El objetivo es asistir en el posicionamiento de camiones mediante lógica de zon
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ros2_ws/
 └── src/
@@ -31,9 +31,9 @@ ros2_ws/
 
 ---
 
-## ⚙️ Fases de Puesta en Marcha
+##  Fases de Puesta en Marcha
 
-### 🔹 Fase 1: Configuración del Hardware
+###  Fase 1: Configuración del Hardware
 1. Conectar el sensor LMS251 a **24V DC** (Marrón = +, Azul = -).
 2. Conectar el cable Ethernet al PC (Windows).
 3. Configurar IP del PC en el mismo rango (ej. `192.168.0.10` / máscara `255.255.255.0`).
@@ -46,7 +46,7 @@ ros2_ws/
 
 ---
 
-### 🔹 Fase 2: Preparación del Entorno ROS2
+### Fase 2: Preparación del Entorno ROS2
 1. Crear workspace:
    ```bash
    mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
@@ -65,7 +65,7 @@ ros2_ws/
     colcon build
     source install/setup.bash
 
-### 🔹 Fase 3: Desarrollo de Nodos
+### Fase 3: Desarrollo de Nodos
 
 1) Nodo Publisher (truck_block_logic.py)
 
@@ -88,7 +88,7 @@ ros2_ws/
 
 
 
-### 🔹 Fase 4: Archivo de Lanzamiento
+### Fase 4: Archivo de Lanzamiento
 
 system.launch.py:
 
