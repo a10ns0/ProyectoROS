@@ -1,0 +1,33 @@
+[1.299s] Invoking command in '/home/sick/ProyectoROS/src/truck_positioning': PYTHONPATH=/home/sick/ProyectoROS/build/truck_positioning/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/sick/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/truck_positioning build --build-base /home/sick/ProyectoROS/build/truck_positioning/build install --record /home/sick/ProyectoROS/build/truck_positioning/install.log --single-version-externally-managed install_data
+[1.653s] running egg_info
+[1.654s] creating ../../build/truck_positioning/truck_positioning.egg-info
+[1.655s] writing ../../build/truck_positioning/truck_positioning.egg-info/PKG-INFO
+[1.656s] writing dependency_links to ../../build/truck_positioning/truck_positioning.egg-info/dependency_links.txt
+[1.656s] writing entry points to ../../build/truck_positioning/truck_positioning.egg-info/entry_points.txt
+[1.656s] writing requirements to ../../build/truck_positioning/truck_positioning.egg-info/requires.txt
+[1.657s] writing top-level names to ../../build/truck_positioning/truck_positioning.egg-info/top_level.txt
+[1.657s] writing manifest file '../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt'
+[1.659s] reading manifest file '../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt'
+[1.662s] writing manifest file '../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt'
+[1.663s] running build
+[1.664s] running build_py
+[1.664s] creating /home/sick/ProyectoROS/build/truck_positioning/build
+[1.664s] creating /home/sick/ProyectoROS/build/truck_positioning/build/lib
+[1.664s] creating /home/sick/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[1.664s] copying truck_positioning/__init__.py -> /home/sick/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[1.664s] running install
+[1.665s] running install_lib
+[1.666s] creating /home/sick/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+[1.666s] copying /home/sick/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/__init__.py -> /home/sick/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+[1.668s] byte-compiling /home/sick/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__init__.py to __init__.cpython-310.pyc
+[1.669s] running install_data
+[1.669s] creating /home/sick/ProyectoROS/install/truck_positioning/share/ament_index
+[1.670s] creating /home/sick/ProyectoROS/install/truck_positioning/share/ament_index/resource_index
+[1.670s] creating /home/sick/ProyectoROS/install/truck_positioning/share/ament_index/resource_index/packages
+[1.670s] copying resource/truck_positioning -> /home/sick/ProyectoROS/install/truck_positioning/share/ament_index/resource_index/packages
+[1.670s] copying package.xml -> /home/sick/ProyectoROS/install/truck_positioning/share/truck_positioning
+[1.670s] running install_egg_info
+[1.675s] Copying ../../build/truck_positioning/truck_positioning.egg-info to /home/sick/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning-0.0.0-py3.10.egg-info
+[1.677s] running install_scripts
+[1.713s] writing list of installed files to '/home/sick/ProyectoROS/build/truck_positioning/install.log'
+[1.751s] Invoked command in '/home/sick/ProyectoROS/src/truck_positioning' returned '0': PYTHONPATH=/home/sick/ProyectoROS/build/truck_positioning/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/sick/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/truck_positioning build --build-base /home/sick/ProyectoROS/build/truck_positioning/build install --record /home/sick/ProyectoROS/build/truck_positioning/install.log --single-version-externally-managed install_data

@@ -1,0 +1,15 @@
+package.xml
+setup.cfg
+setup.py
+../../build/truck_positioning/truck_positioning.egg-info/PKG-INFO
+../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt
+../../build/truck_positioning/truck_positioning.egg-info/dependency_links.txt
+../../build/truck_positioning/truck_positioning.egg-info/entry_points.txt
+../../build/truck_positioning/truck_positioning.egg-info/requires.txt
+../../build/truck_positioning/truck_positioning.egg-info/top_level.txt
+../../build/truck_positioning/truck_positioning.egg-info/zip-safe
+resource/truck_positioning
+test/test_copyright.py
+test/test_flake8.py
+test/test_pep257.py
+truck_positioning/__init__.py
