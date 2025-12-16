@@ -21,14 +21,7 @@ El objetivo es asistir en el posicionamiento de camiones mediante lógica de zon
 
 ## Estructura del Proyecto
 
-ros2_ws/
-└── src/
-├── sick_scan_xd/          # Driver oficial del sensor
-└── truck_positioning/     # Paquete personalizado
-├── truck_block_logic.py   # Nodo Publisher (procesamiento y visualización)
-├── truck_hmi.py           # Nodo Subscriber (interfaz operador)
-└── launch/
-└── system.launch.py    # Archivo de lanzamiento
+<img width="472" height="164" alt="image" src="https://github.com/user-attachments/assets/6a996eda-8da9-4625-ad73-715e62aa9a74" />
 
 ---
 
@@ -50,7 +43,7 @@ ros2_ws/
 ### Fase 2: Preparación del Entorno ROS2
 1. Crear workspace:
    ```bash
-   mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
+   mkdir -p ~/ProyectoROS/src && cd ~/ros2_ws/src
 
 2. Instal driver:
    ```bash
@@ -62,7 +55,7 @@ ros2_ws/
 
  4. Compilar:
     ```bash
-    cd ~/ros2_ws
+    cd ~/ProyectoROS
     colcon build
     source install/setup.bash
 
@@ -108,7 +101,7 @@ system.launch.py:
 
 1. Compilar nuevamente:
    ```bash
-   cd ~/ros2_ws
+   cd ~/ProyectoROS
    colcon build --packages-select truck_positioning
    source install/setup.bash
 
