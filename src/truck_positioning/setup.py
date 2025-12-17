@@ -25,6 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
             'logic_node = truck_positioning.logic_node:main',
+            'lector = truck_positioning.ejemplo:main',
+
         ],
     },
 )
