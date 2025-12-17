@@ -13,3 +13,5 @@ test/test_copyright.py
 test/test_flake8.py
 test/test_pep257.py
 truck_positioning/__init__.py
+truck_positioning/ejemplo.py
+truck_positioning/logic_node.py
