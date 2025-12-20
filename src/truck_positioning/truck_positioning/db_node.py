@@ -26,7 +26,7 @@ class CraneDBNode(Node):
         
         if datos:
             # 2. Crear diccionario con los datos
-            # Asumimos que la DB devuelve: [0]=angulo, [1]=distancia, [2]=estado
+            # Asumimos que la DB devuelve: [0]=angulo, [1]=distancia, [2]=estado, TENEMOS QUE VER QUE VALORES QUE VAMOS A CONSIDERAR Y EN QUE ORDEN ESTAN
             config_dict = {
                 "angulo": float(datos[0]),
                 "limite": float(datos[1]),
