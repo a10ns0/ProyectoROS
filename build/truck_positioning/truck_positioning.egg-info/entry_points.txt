@@ -1,4 +1,8 @@
 [console_scripts]
+calculador_distancia = truck_positioning.calculador_distancia:main
 lector = truck_positioning.ejemplo:main
 logic_node = truck_positioning.logic_node:main
+monitor_dual = truck_positioning.monitor_dual:main
+visualizador = truck_positioning.visualizador_perfil:main
+visualizador_amarillo = truck_positioning.visualizador_amarillo:main
 

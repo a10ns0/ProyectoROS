@@ -1,0 +1,1 @@
+/home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/truck_positioning/visualizador_perfil.py.launch.py

@@ -1,0 +1,1 @@
+/home/sick/Documents/GitHub/ProyectoROS/src/truck_positioning/setup.py

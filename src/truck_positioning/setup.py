@@ -1,3 +1,5 @@
+import os
+from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'truck_positioning'
@@ -10,6 +12,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+	(os.path.join('share', package_name), glob('truck_positioning/*.launch.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -26,7 +29,10 @@ setup(
         'console_scripts': [
             'logic_node = truck_positioning.logic_node:main',
             'lector = truck_positioning.ejemplo:main',
-
+            'visualizador = truck_positioning.visualizador_perfil:main',
+            'visualizador_amarillo = truck_positioning.visualizador_amarillo:main',
+            'monitor_dual = truck_positioning.monitor_dual:main',
+	    'calculador_distancia = truck_positioning.calculador_distancia:main',
         ],
     },
 )

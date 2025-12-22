@@ -1,0 +1,46 @@
+running develop
+Removing /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck-positioning.egg-link (link to .)
+running egg_info
+writing ../../build/truck_positioning/truck_positioning.egg-info/PKG-INFO
+writing dependency_links to ../../build/truck_positioning/truck_positioning.egg-info/dependency_links.txt
+writing entry points to ../../build/truck_positioning/truck_positioning.egg-info/entry_points.txt
+writing requirements to ../../build/truck_positioning/truck_positioning.egg-info/requires.txt
+writing top-level names to ../../build/truck_positioning/truck_positioning.egg-info/top_level.txt
+reading manifest file '../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt'
+writing manifest file '../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt'
+running build
+running build_py
+copying truck_positioning/sensor_longitudinal.launch.py -> /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+running install
+running install_lib
+creating /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+copying /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/visualizador_perfil.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+copying /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/__init__.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+copying /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/sensor_perfil.launch.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+copying /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/visualizador_amarillo.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+copying /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/logic_node.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+copying /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/monitor_dual.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+copying /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/visualizador_perfil.py.launch.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+copying /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/ejemplo.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+copying /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/sensor_longitudinal.launch.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+byte-compiling /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_perfil.py to visualizador_perfil.cpython-310.pyc
+byte-compiling /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__init__.py to __init__.cpython-310.pyc
+byte-compiling /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/sensor_perfil.launch.py to sensor_perfil.launch.cpython-310.pyc
+byte-compiling /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_amarillo.py to visualizador_amarillo.cpython-310.pyc
+byte-compiling /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/logic_node.py to logic_node.cpython-310.pyc
+byte-compiling /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/monitor_dual.py to monitor_dual.cpython-310.pyc
+byte-compiling /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_perfil.py.launch.py to visualizador_perfil.py.launch.cpython-310.pyc
+byte-compiling /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/ejemplo.py to ejemplo.cpython-310.pyc
+byte-compiling /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/sensor_longitudinal.launch.py to sensor_longitudinal.launch.cpython-310.pyc
+running install_data
+copying resource/truck_positioning -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/share/ament_index/resource_index/packages
+copying package.xml -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning
+running install_egg_info
+Copying ../../build/truck_positioning/truck_positioning.egg-info to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning-0.0.0-py3.10.egg-info
+running install_scripts
+Installing lector script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing logic_node script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing monitor_dual script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing visualizador script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing visualizador_amarillo script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+writing list of installed files to '/home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/install.log'
