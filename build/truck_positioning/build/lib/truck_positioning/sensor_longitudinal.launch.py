@@ -30,11 +30,12 @@ def generate_launch_description():
                 'max_ang': 1.658,
                 'use_binary_protocol': True,
                 'intensity': True,
+		'range_max': 2.5,
                 'frame_id': 'cloud_longitudinal'
             }
         ],
         remappings=[
-            ('/scan', '/scan_longitudinal')
+            ('/sick_lms_5xx/scan', '/scan_distancia')
         ]
     )
 

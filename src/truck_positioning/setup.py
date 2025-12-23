@@ -33,6 +33,7 @@ setup(
             'visualizador_amarillo = truck_positioning.visualizador_amarillo:main',
             'monitor_dual = truck_positioning.monitor_dual:main',
 	    'calculador_distancia = truck_positioning.calculador_distancia:main',
+	    'interfaz_camion = truck_positioning.interfaz_camion:main',
         ],
     },
 )

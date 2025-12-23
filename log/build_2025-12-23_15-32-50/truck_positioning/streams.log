@@ -1,0 +1,27 @@
+[0.591s] Invoking command in '/home/sick/Documents/GitHub/ProyectoROS/src/truck_positioning': PYTHONPATH=/home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/truck_positioning build --build-base /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build install --record /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/install.log --single-version-externally-managed install_data
+[0.814s] running egg_info
+[0.814s] writing ../../build/truck_positioning/truck_positioning.egg-info/PKG-INFO
+[0.816s] writing dependency_links to ../../build/truck_positioning/truck_positioning.egg-info/dependency_links.txt
+[0.816s] writing entry points to ../../build/truck_positioning/truck_positioning.egg-info/entry_points.txt
+[0.816s] writing requirements to ../../build/truck_positioning/truck_positioning.egg-info/requires.txt
+[0.817s] writing top-level names to ../../build/truck_positioning/truck_positioning.egg-info/top_level.txt
+[0.821s] reading manifest file '../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt'
+[0.821s] writing manifest file '../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt'
+[0.821s] running build
+[0.821s] running build_py
+[0.821s] running install
+[0.821s] running install_lib
+[0.823s] running install_data
+[0.823s] running install_egg_info
+[0.826s] removing '/home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning-0.0.0-py3.10.egg-info' (and everything under it)
+[0.826s] Copying ../../build/truck_positioning/truck_positioning.egg-info to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning-0.0.0-py3.10.egg-info
+[0.826s] running install_scripts
+[0.848s] Installing calculador_distancia script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[0.850s] Installing interfaz_camion script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[0.850s] Installing lector script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[0.851s] Installing logic_node script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[0.851s] Installing monitor_dual script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[0.851s] Installing visualizador script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[0.853s] Installing visualizador_amarillo script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[0.854s] writing list of installed files to '/home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/install.log'
+[0.901s] Invoked command in '/home/sick/Documents/GitHub/ProyectoROS/src/truck_positioning' returned '0': PYTHONPATH=/home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/truck_positioning build --build-base /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/build install --record /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/install.log --single-version-externally-managed install_data
