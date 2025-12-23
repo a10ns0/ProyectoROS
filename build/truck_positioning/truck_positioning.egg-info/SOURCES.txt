@@ -9,9 +9,6 @@ setup.py
 ../../build/truck_positioning/truck_positioning.egg-info/top_level.txt
 ../../build/truck_positioning/truck_positioning.egg-info/zip-safe
 resource/truck_positioning
-test/test_copyright.py
-test/test_flake8.py
-test/test_pep257.py
 truck_positioning/__init__.py
 truck_positioning/calculador_distancia.py
 truck_positioning/ejemplo.py
@@ -24,3 +21,10 @@ truck_positioning/sistema_completo.launch.py
 truck_positioning/visualizador_amarillo.py
 truck_positioning/visualizador_perfil.py
 truck_positioning/visualizador_perfil.py.launch.py
+truck_positioning.egg-info/PKG-INFO
+truck_positioning.egg-info/SOURCES.txt
+truck_positioning.egg-info/dependency_links.txt
+truck_positioning.egg-info/entry_points.txt
+truck_positioning.egg-info/requires.txt
+truck_positioning.egg-info/top_level.txt
+truck_positioning.egg-info/zip-safe

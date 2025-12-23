@@ -1,0 +1,27 @@
+running develop
+running egg_info
+writing truck_positioning.egg-info/PKG-INFO
+writing dependency_links to truck_positioning.egg-info/dependency_links.txt
+writing entry points to truck_positioning.egg-info/entry_points.txt
+writing requirements to truck_positioning.egg-info/requires.txt
+writing top-level names to truck_positioning.egg-info/top_level.txt
+reading manifest file 'truck_positioning.egg-info/SOURCES.txt'
+writing manifest file 'truck_positioning.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck-positioning.egg-link (link to .)
+Installing calculador_distancia script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing interfaz_camion script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing lector script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing logic_node script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing monitor_dual script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing visualizador script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+Installing visualizador_amarillo script to /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+
+Installed /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning
+running symlink_data
+symbolically linking /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/resource/truck_positioning -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/share/ament_index/resource_index/packages
+symbolically linking /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/package.xml -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning
+symbolically linking /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/truck_positioning/visualizador_perfil.py.launch.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning
+symbolically linking /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/truck_positioning/sensor_antiguo.launch.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning
+symbolically linking /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/truck_positioning/sistema_completo.launch.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning
+symbolically linking /home/sick/Documents/GitHub/ProyectoROS/build/truck_positioning/truck_positioning/sensor_longitudinal.launch.py -> /home/sick/Documents/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning
