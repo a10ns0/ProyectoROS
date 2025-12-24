@@ -8,56 +8,52 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
     pkg_path = get_package_share_directory('truck_positioning')
 
-    # 1. Arrancar Sensor ANTIGUO (Amarillo)
+    # 1. Arrancar Sensor ANTIGUO (Amarillo) - Tópico: /scan_estructura
     sensor_antiguo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            # ASEGÚRATE QUE ESTE SEA EL NOMBRE CORRECTO DE TU ARCHIVO DEL SENSOR VIEJO
             os.path.join(pkg_path, 'sensor_antiguo.launch.py') 
         ),
         launch_arguments={
             'hostname': '192.168.0.2',
-            'frame_id': 'sensor_antiguo_link' # Forza el nombre del frame
+            # El frame_id ya está definido dentro del archivo como 'sensor_antiguo_link'
         }.items()
     )
 
-    # 2. Arrancar Sensor NUEVO (Rosado)
-    sensor_nuevo = IncludeLaunchDescription(
+    # 2. Arrancar Sensor LONGITUDINAL (Rosado) - Tópico: /scan_distancia
+    # Este sensor tiene hardcodeado el nombre 'cloud_longitudinal'
+    sensor_longitudinal = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-             # ASEGÚRATE QUE ESTE SEA EL NOMBRE CORRECTO DE TU ARCHIVO DEL SENSOR NUEVO
             os.path.join(pkg_path, 'sensor_longitudinal.launch.py')
         ),
         launch_arguments={
             'hostname': '192.168.0.3',
-            'frame_id': 'sensor_nuevo_link' # Forza el nombre del frame
+            # Eliminamos el intento de cambiar el frame_id porque el otro archivo lo ignora
         }.items()
     )
 
     # =====================================================================
-    # AQUÍ ES DONDE SE DEFINE LA POSICIÓN FÍSICA EN LA GRÚA (TF)
-    # Los números son: x y z yaw pitch roll
-    # x: Distancia hacia adelante (metros)
-    # z: Altura (metros)
-    # pitch: Rotación hacia abajo (radianes). 1.5708 son 90 grados (mirando al suelo)
+    # CONFIGURACIÓN DE POSICIONES (TF)
+    # Aquí definimos dónde está cada sensor respecto al mapa (base)
     # =====================================================================
 
-    # Transformada para el Sensor ANTIGUO (Digamos que está en el origen, x=0)
+    # Transformada para el Sensor ANTIGUO
+    # Frame: sensor_antiguo_link
     tf_antiguo = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='tf_antiguo_broadcaster',
-        # Argumentos: x y z yaw pitch roll frame_padre frame_hijo
-        # EJEMPLO: Está en x=0, a 3 metros de altura (z=3), mirando hacia abajo (pitch=1.57)
-        arguments=['0', '0', '3.0', '0', '1.5708', '0', 'map', 'sensor_antiguo_link']
+        # x=0, z=3m de altura. HIJO: sensor_antiguo_link
+        arguments=['0', '0', '3.0', '0', '0', '0', 'base_link', 'sensor_antiguo_link']
     )
 
-    # Transformada para el Sensor NUEVO (Digamos que está a 5 metros del otro)
-    tf_nuevo = Node(
+    # Transformada para el Sensor LONGITUDINAL
+    # AQUÍ ESTABA EL ERROR: Cambiamos 'sensor_nuevo_link' por 'cloud_longitudinal'
+    tf_longitudinal = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
-        name='tf_nuevo_broadcaster',
-        # EJEMPLO: Está en x=5.0 (5 metros adelante), misma altura y rotación.
-        # --- ¡AJUSTA EL '5.0' PARA CAMBIAR LA DISTANCIA ENTRE SENSORES! ---
-        arguments=['5.0', '0', '3.0', '0', '1.5708', '0', 'map', 'sensor_nuevo_link']
+        name='tf_longitudinal_broadcaster',
+        # x=5.0 (5 metros separado del otro). HIJO: cloud_longitudinal
+        arguments=['5.0', '0', '3.0', '0', '0', '0', 'base_link', 'cloud_longitudinal']
     )
     # =====================================================================
 
@@ -68,20 +64,11 @@ def generate_launch_description():
         output='screen'
     )
 
-    # 5. Arrancar RViz2 automáticamente con una configuración preguardada
-    # (Opcional, primero probaremos sin esto)
-    # rviz_node = Node(
-    #     package='rviz2',
-    #     executable='rviz2',
-    #     name='rviz2',
-    #     arguments=['-d', os.path.join(pkg_path, 'config_camion.rviz')]
-    # )
-
     return LaunchDescription([
         sensor_antiguo,
-        sensor_nuevo,
+        sensor_longitudinal,
         tf_antiguo,
-        tf_nuevo,
-        calculador_nodo,
-        # rviz_node
+        tf_longitudinal,
+        calculador_nodo
     ])
+

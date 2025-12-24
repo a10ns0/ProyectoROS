@@ -1,1 +1,1 @@
-/home/sick/Documents/GitHub/ProyectoROS/src/truck_positioning/setup.py
+/home/nuc/Documentos/GitHub/ProyectoROS/src/truck_positioning/setup.py
