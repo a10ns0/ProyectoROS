@@ -3,38 +3,47 @@ from rclpy.node import Node
 from std_msgs.msg import String
 import json
 
-class GruaVisualizer(Node):
+class GruaFullVisualizer(Node):
     def __init__(self):
-        super().__init__('grua_visualizer')
+        super().__init__('grua_full_visualizer')
         
         self.subscription = self.create_subscription(
             String,
-            'grua/spreader_twistlock',
+            'grua/estado_completo', # Suscrito al nuevo tópico
             self.listener_callback,
             10)
-        self.get_logger().info('Esperando datos de la grúa...')
+        self.get_logger().info('Esperando telemetría completa de la grúa...')
 
     def listener_callback(self, msg):
         try:
-            # 1. Convertimos el String de ROS vuelta a un Diccionario Python
-            data_json = json.loads(msg.data)
+            data = json.loads(msg.data)
             
-            # 2. Mostramos la información
-            # Aquí puedes acceder a las claves del JSON directamente
-            # Por ejemplo, si la respuesta es {"estado": true, "valor": 1}
-            print(f"--- Recibido ---")
-            print(f"Datos crudos: {data_json}")
+            # Limpiamos consola (opcional, para efecto de "panel de control")
+            # print("\033c", end="") 
             
-            # Ejemplo de acceso a valor (ajustar según la respuesta real de tu API)
-            # valor = data_json.get('value') 
-            # print(f"Estado Twistlock: {valor}")
+            print("========================================")
+            print(f"   ESTADO GRÚA STS-001 (Recibido)      ")
+            print("========================================")
+            
+            # Extraemos los valores con seguridad (usando .get por si alguno viene null)
+            # Asumiendo que la API devuelve el dato dentro de una llave, o el dato directo.
+            # Ajustar según la estructura real de tu JSON.
+            
+            trolley = data.get("trolleyPos", "N/A")
+            size    = data.get("spreaderSize", "N/A")
+            lock    = data.get("spreaderTwistlock", "N/A")
+
+            print(f" -> Posición Trolley : {trolley}")
+            print(f" -> Tamaño Spreader  : {size}")
+            print(f" -> Twistlock        : {lock}")
+            print("----------------------------------------")
 
         except json.JSONDecodeError:
-            self.get_logger().error('Error al decodificar el JSON recibido')
+            self.get_logger().error('Error de formato JSON')
 
 def main(args=None):
     rclpy.init(args=args)
-    node = GruaVisualizer()
+    node = GruaFullVisualizer()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
