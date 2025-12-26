@@ -1,0 +1,1 @@
+/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/launch/sistema_completo.launch.py

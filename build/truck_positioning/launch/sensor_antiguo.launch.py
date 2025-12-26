@@ -1,0 +1,1 @@
+/home/nuc/Documentos/GitHub/ProyectoROS/src/truck_positioning/launch/sensor_antiguo.launch.py

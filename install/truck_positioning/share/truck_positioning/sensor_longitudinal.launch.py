@@ -1,1 +1,0 @@
-/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/truck_positioning/sensor_longitudinal.launch.py

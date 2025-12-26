@@ -1,0 +1,1 @@
+/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/launch/visualizador_perfil.py.launch.py

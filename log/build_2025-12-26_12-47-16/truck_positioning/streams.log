@@ -1,0 +1,23 @@
+[0.633s] Invoking command in '/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning': PYTHONPATH=/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build --no-deps symlink_data
+[0.898s] running develop
+[1.067s] running egg_info
+[1.067s] writing truck_positioning.egg-info/PKG-INFO
+[1.068s] writing dependency_links to truck_positioning.egg-info/dependency_links.txt
+[1.068s] writing entry points to truck_positioning.egg-info/entry_points.txt
+[1.068s] writing requirements to truck_positioning.egg-info/requires.txt
+[1.068s] writing top-level names to truck_positioning.egg-info/top_level.txt
+[1.070s] reading manifest file 'truck_positioning.egg-info/SOURCES.txt'
+[1.071s] writing manifest file 'truck_positioning.egg-info/SOURCES.txt'
+[1.073s] running build_ext
+[1.073s] Creating /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck-positioning.egg-link (link to .)
+[1.075s] Installing calculador_distancia script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.075s] Installing interfaz_camion script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.075s] Installing lector script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.075s] Installing logic_node script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.075s] Installing monitor_dual script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.075s] Installing visualizador script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.076s] Installing visualizador_amarillo script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.076s] 
+[1.076s] Installed /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning
+[1.076s] running symlink_data
+[1.108s] Invoked command in '/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning' returned '0': PYTHONPATH=/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build --no-deps symlink_data
