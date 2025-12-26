@@ -13,8 +13,9 @@ test/test_copyright.py
 test/test_flake8.py
 test/test_pep257.py
 truck_positioning/__init__.py
+truck_positioning/cliente_API.py
+truck_positioning/consulta_bd.py
 truck_positioning/database_manager.py
-truck_positioning/db_node.py
 truck_positioning/ejemplo.py
 truck_positioning/logic_node.py
-truck_positioning/test_sub_db.py
+truck_positioning/sub_BD.py
