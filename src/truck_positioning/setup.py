@@ -26,8 +26,8 @@ setup(
         'console_scripts': [
             'logic_node = truck_positioning.logic_node:main',
             'lector = truck_positioning.ejemplo:main',
-            'api_BD = truck_positioning.consumir_api:main',
-            'consulta_BD = truck_positioning.consulta_bd:main',
+            'cliente_API = truck_positioning.cliente_API:main',
+            'sub_BD = truck_positioning.sub_BD:main',
         ],
     },
 )
