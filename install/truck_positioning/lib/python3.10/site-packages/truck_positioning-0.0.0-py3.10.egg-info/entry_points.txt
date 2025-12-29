@@ -2,6 +2,7 @@
 cliente_API = truck_positioning.cliente_API:main
 lector = truck_positioning.ejemplo:main
 logic_node = truck_positioning.logic_node:main
+simple_truck_sim = truck_positioning.simple_truck_sim:main
 sub_BD = truck_positioning.sub_BD:main
 truck_control = truck_positioning.truck_control:main
 truck_perception = truck_positioning.truck_perception:main

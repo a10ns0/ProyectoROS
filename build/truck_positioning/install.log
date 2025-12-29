@@ -1,16 +1,14 @@
-/home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/consulta_bd.py
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/truck_control.py
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__init__.py
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/cliente_API.py
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/sub_BD.py
-/home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/database_manager.py
+/home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/simple_truck_sim.py
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/truck_perception.py
-/home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/consulta_bd.cpython-310.pyc
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/truck_control.cpython-310.pyc
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/__init__.cpython-310.pyc
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/cliente_API.cpython-310.pyc
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/sub_BD.cpython-310.pyc
-/home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/database_manager.cpython-310.pyc
+/home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/simple_truck_sim.cpython-310.pyc
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/truck_perception.cpython-310.pyc
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/share/ament_index/resource_index/packages/truck_positioning
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/share/truck_positioning/package.xml
@@ -24,6 +22,7 @@
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/truck_positioning/cliente_API
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/truck_positioning/lector
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/truck_positioning/logic_node
+/home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/truck_positioning/simple_truck_sim
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/truck_positioning/sub_BD
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/truck_positioning/truck_control
 /home/sick/Documents/Proyecto/ProyectoROS/install/truck_positioning/lib/truck_positioning/truck_perception
