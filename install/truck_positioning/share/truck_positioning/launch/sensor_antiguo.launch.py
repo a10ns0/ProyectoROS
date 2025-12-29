@@ -17,7 +17,7 @@ def generate_launch_description():
             launch_file_auto_restart_params,
             {
                 'scanner_type': 'sick_lms_5xx',
-                'hostname': '192.168.0.2',
+                'hostname': '192.168.1.101',
                 'port': '2112',
                 'udp_receiver_ip': '0.0.0.0',
                 'min_ang': -1.57,

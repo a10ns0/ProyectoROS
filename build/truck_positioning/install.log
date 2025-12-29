@@ -1,3 +1,4 @@
+/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/sub_BD.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/ejemplo.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_amarillo.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/logic_node.py
@@ -5,8 +6,10 @@
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/monitor_dual.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_perfil.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/calculador_distancia.py
+/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/cliente_API.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/interfaz_camion.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__init__.py
+/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/sub_BD.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/ejemplo.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/visualizador_amarillo.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/logic_node.cpython-310.pyc
@@ -14,6 +17,7 @@
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/monitor_dual.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/visualizador_perfil.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/calculador_distancia.cpython-310.pyc
+/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/cliente_API.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/interfaz_camion.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/__init__.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/share/ament_index/resource_index/packages/truck_positioning
@@ -33,9 +37,11 @@
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning-0.0.0-py3.10.egg-info/zip-safe
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning-0.0.0-py3.10.egg-info/requires.txt
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/calculador_distancia
+/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/cliente_API
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/interfaz_camion
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/lector
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/logic_node
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/monitor_dual
+/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/sub_BD
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/visualizador
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/visualizador_amarillo

@@ -9,7 +9,7 @@ def generate_launch_description():
     sick_scan_pkg_prefix = get_package_share_directory('sick_scan_xd')
     launch_file_auto_restart_params = os.path.join(sick_scan_pkg_prefix, 'config', 'sick_auto_restart.yaml')
 
-    hostname_launch_arg = DeclareLaunchArgument('hostname', default_value='192.168.0.3')
+    hostname_launch_arg = DeclareLaunchArgument('hostname', default_value='192.168.1.100')
     udp_receiver_ip_launch_arg = DeclareLaunchArgument('udp_receiver_ip', default_value='0.0.0.0')
 
     # 1. NODO DEL SENSOR (Driver "Amordazado")

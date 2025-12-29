@@ -15,7 +15,7 @@ def generate_launch_description():
             os.path.join(pkg_path, 'launch', 'sensor_antiguo.launch.py') 
         ),
         launch_arguments={
-            'hostname': '192.168.0.2',
+            'hostname': '192.168.1.101',
         }.items()
     )
 
@@ -26,7 +26,7 @@ def generate_launch_description():
             os.path.join(pkg_path, 'launch', 'sensor_longitudinal.launch.py')
         ),
         launch_arguments={
-            'hostname': '192.168.0.3',
+            'hostname': '192.168.1.100',
         }.items()
     )
     
