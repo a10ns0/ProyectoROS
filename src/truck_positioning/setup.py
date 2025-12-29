@@ -28,6 +28,9 @@ setup(
             'lector = truck_positioning.ejemplo:main',
             'cliente_API = truck_positioning.cliente_API:main',
             'sub_BD = truck_positioning.sub_BD:main',
+            'truck_perception = truck_positioning.truck_perception:main',
+            'truck_control = truck_positioning.truck_control:main',
+            
         ],
     },
 )

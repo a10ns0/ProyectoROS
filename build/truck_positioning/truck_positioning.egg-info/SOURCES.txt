@@ -16,6 +16,6 @@ truck_positioning/__init__.py
 truck_positioning/cliente_API.py
 truck_positioning/consulta_bd.py
 truck_positioning/database_manager.py
-truck_positioning/ejemplo.py
-truck_positioning/logic_node.py
 truck_positioning/sub_BD.py
+truck_positioning/truck_control.py
+truck_positioning/truck_perception.py
