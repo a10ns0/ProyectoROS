@@ -10,6 +10,43 @@ class VisualizadorSTS_Simulador(Node):
     def __init__(self):
         super().__init__('visualizador_sts_manual')
         
+        # =========================================================
+        # A) EL CAMIÓN VIRTUAL (GENERADO DESDE TU URDF)
+        # =========================================================
+        print(">>> GENERANDO CAMIÓN DESDE ESPECIFICACIÓN URDF... <<<")
+        
+        # 1. CONSTRUCCIÓN DEL CHASIS (La caja azul)
+        # Dimensiones XML: 12.0 x 2.4 x 1.2
+        # Open3D crea cajas desde la esquina, así que hay que centrarlas manualmente.
+        chassis = o3d.geometry.TriangleMesh.create_box(width=12.0, height=2.4, depth=1.2)
+        chassis.compute_vertex_normals()
+        chassis.paint_uniform_color([0.0, 0.0, 0.8]) # Material "blue" del URDF
+        
+        # Mover el pivote al centro del chasis para manejarlo fácil
+        chassis.translate(np.array([-6.0, -1.2, -0.6])) # Centrar en (0,0,0) local
+        
+        # 2. CONSTRUCCIÓN DE LA CABINA (La caja roja)
+        # Dimensiones XML: 2.5 x 2.4 x 3.0
+        cabin = o3d.geometry.TriangleMesh.create_box(width=2.5, height=2.4, depth=3.0)
+        cabin.compute_vertex_normals()
+        cabin.paint_uniform_color([0.8, 0.0, 0.0]) # Material "red" del URDF
+        
+        # Centrar cabina localmente
+        cabin.translate(np.array([-1.25, -1.2, -1.5])) 
+        
+        # 3. ENSAMBLAJE (SOLDADURA VIRTUAL)
+        # Según tu URDF, la cabina está desplazada respecto al chasis.
+        # Joint 'chassis_to_cabin': xyz="5.0 0 1.5"
+        cabin.translate(np.array([5.0, 0, 1.5])) 
+
+        # Fusionamos ambas partes en una sola malla para mover el camión entero
+        self.camion_mesh = chassis + cabin
+        
+        # 4. POSICIONAMIENTO INICIAL EN LA SIMULACIÓN
+        # Elevamos todo para que las ruedas (imaginarias) toquen el suelo
+        # El chasis tiene altura 1.2, su centro es 0.6. Lo subimos un poco más.
+        self.camion_mesh.translate(np.array([0, 0, 0.8]), relative=False)
+        
         # ==============================================================================
         # SECCIÓN 1: GEOMETRÍA (CAJAS VIRTUALES)
         # ==============================================================================
@@ -56,14 +93,14 @@ class VisualizadorSTS_Simulador(Node):
         # ==============================================================================
         self.CFG_LONG = {
             'pos': [8.0, 0.0, 4.0],        
-            'dist_min': 0.1, 'dist_max': 12.0,
+            'dist_min': 0.1, 'dist_max': 20,
             'ang_min': -95.0, 'ang_max': 0, 
             'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(90) 
         }
 
         self.CFG_ESTRUC = {
-            'pos': [-5.8, 0.0, 8.0],       
-            'dist_min': 0.1, 'dist_max': 12.0,
+            'pos': [-5.8, 0.0, 12.5],       
+            'dist_min': 0.1, 'dist_max': 20,
             'ang_min': -45.0, 'ang_max': 45.0, 
             'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(0)
         }
