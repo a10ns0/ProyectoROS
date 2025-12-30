@@ -11,7 +11,7 @@ class GruaFullStateClient(Node):
         # --- CONFIGURACIÓN ---
         self.ip_servidor = "192.168.1.88"
         self.port = "8000"
-        self.nombre_grua = "STS-005"
+        self.nombre_grua = "STS-006"
         
         # Lista de variables a consultar
         self.variables_a_consultar = ["trolleyPos", "spreaderSize", "spreaderTwistlock"]

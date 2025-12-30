@@ -1,189 +1,332 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import String  # 🔥 Necesario para recibir el JSON de la grúa
 import open3d as o3d
 import numpy as np
 import threading
 import time
-import json # 🔥 Necesario para leer los datos
 
-class VisualizadorSTS(Node):
+class VisualizadorSTS_Simulador(Node):
     def __init__(self):
-        super().__init__('visualizador_sts_realtime')
+        super().__init__('visualizador_sts_manual')
         
-        # ==========================================
-        # 1. CONFIGURACIÓN DE GEOMETRÍA (CAJAS VIRTUALES)
-        # ==========================================
-        # Aquí definimos dónde debe estacionarse el camión según el Spreader
+        # ==============================================================================
+        # SECCIÓN 1: GEOMETRÍA (CAJAS VIRTUALES)
+        # ==============================================================================
+        # MODIFICACIÓN SOLICITADA: CAJAS MÁS ALTAS PARA MODO DESCARGA
+        # Hemos subido la Z mínima a 1.2m y la máxima a 4.5m.
+        # Esto obliga a mirar "arriba" (al contenedor) y no al suelo.
+        
         self.DB_GEOMETRIA = {
-            '40': { # CASO SPREADER 40 PIES
-                'min': [-6.0, -1.2, 1.0], 
-                'max': [ 6.0,  1.2, 1.6], 
-                'desc': "40 PIES (ESTÁNDAR)" 
+            '40': { 
+                'min': [-6.0, -1.2, 1.0], # <--- Z subió (Antes 0.5)
+                'max': [ 6.0,  1.2, 4.5], # <--- Z subió (Antes 4.0)
+                'desc': "40 PIES (ALTO)"
             },
-            '20': { # CASO SPREADER 20 PIES (Cola del chasis)
-                'min': [-6.0, -1.2, 1.0], 
-                'max': [ 0.0,  1.2, 1.6], 
-                'desc': "20 PIES (POSICIÓN TRASERA)" 
+            '20': { 
+                'min': [-3.0, -1.2, 1.0], # <--- Z subió
+                'max': [ 3.0,  1.2, 4.5], # <--- Z subió
+                'desc': "20 PIES (ALTO)"
             }
         }
         
-        # Estado inicial (Asumimos 40 hasta que la grúa diga lo contrario)
-        self.modo_actual = '40'
-        self.zona_actual = self.DB_GEOMETRIA['40']
-        
-        # Variables de la Grúa (Para mostrar en pantalla/consola)
-        self.grua_trolley = "N/A"
-        self.grua_twistlock = "N/A"
-
-        # ==========================================
-        # 2. CONEXIÓN CON LA GRÚA (Suscripción ROS) 🔥
-        # ==========================================
-        # Nos "colgamos" del cable que tira el client_API.py
-        self.create_subscription(String, 'grua/estado_completo', self.callback_grua_api, 10)
-        print(">>> SISTEMA INICIADO: ESPERANDO DATOS DE LA GRÚA... <<<")
-
-        # --- CONFIG SENSOR LÁSER (TU HARDWARE) ---
-        self.CFG_SENSOR = {
-            'pos': [0.0, 0.0, 3.0],      # Altura de la grúa
-            'dist_min': 0.1, 'dist_max': 15.0,
-            'ang_min': -15.0, 'ang_max': 15.0,
-            'pitch': np.radians(-90), 'yaw': np.radians(90), 'roll': 0
+        self.ZONA_PERFIL = { 
+            'min': [-6.3, -2.5, 0.0], 
+            'max': [ -1.0,  2.5, 5.0] 
         }
 
-        # --- LÓGICA DE SEGURIDAD (PLC) ---
-        self.timer_inicio = None
-        self.TIEMPO_CONFIRMACION = 3.0 
-        self.LONGITUD_MINIMA = 3.5    
-        self.estado_validacion = "VACIO" 
-
-        # ROS Setup Láser
-        self.create_subscription(LaserScan, '/scan_estructura', self.callback_sensor_laser, 10)
-        self.pcd_buffer = o3d.geometry.PointCloud()
-        self.new_data = False
-        self.actualizar_caja = False # Bandera para actualizar gráfico
-
-        # --- INTERFAZ GRÁFICA ---
-        self.vis = o3d.visualization.Visualizer()
-        self.vis.create_window(window_name="STS - Operación en Vivo", width=1280, height=720)
-        self.vis.get_render_option().background_color = np.asarray([0.1, 0.1, 0.1])
-        self.vis.get_render_option().point_size = 4.0
-
-        # Objetos Visuales
-        self.box_visual = o3d.geometry.AxisAlignedBoundingBox(
-            min_bound=np.array(self.zona_actual['min']),
-            max_bound=np.array(self.zona_actual['max'])
-        )
-        self.box_visual.color = [1, 0, 0] # Rojo
-        self.vis.add_geometry(self.box_visual)
-        self.vis.add_geometry(self.crear_suelo())
+        # Estado inicial
+        self.modo_actual = '40'
+        self.zona_target = self.DB_GEOMETRIA['40']
         
-        s1 = o3d.geometry.TriangleMesh.create_sphere(radius=0.3)
-        s1.paint_uniform_color([0, 1, 1]); s1.translate(self.CFG_SENSOR['pos'])
-        self.vis.add_geometry(s1)
-        self.vis.add_geometry(self.pcd_buffer)
+        # =========================================================
+        # FILTRO PARA MODO CARGA (CHASIS)
+        # =========================================================
+        # MODIFICACIÓN SOLICITADA: Límite máximo estricto de 1.7m
+        self.CHASIS_VACIO = {
+            'alto_min': 0.1,  # 0.6 original # Ignorar suelo/ruedas
+            'alto_max': 2.0,  # 1.7 original # <--- CORTE PARA IGNORAR CABINA
+            'ancho_min': 0.2, # 2.2 original
+        }
+        
+        self.modo_operacion = "DESCARGA" 
 
+        # ==============================================================================
+        # SECCIÓN 2: HARDWARE (SENSORES)
+        # ==============================================================================
+        self.CFG_LONG = {
+            'pos': [8.0, 0.0, 4.0],        
+            'dist_min': 0.1, 'dist_max': 12.0,
+            'ang_min': -95.0, 'ang_max': 0, 
+            'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(90) 
+        }
+
+        self.CFG_ESTRUC = {
+            'pos': [-5.8, 0.0, 8.0],       
+            'dist_min': 0.1, 'dist_max': 12.0,
+            'ang_min': -45.0, 'ang_max': 45.0, 
+            'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(0)
+        }
+
+        # ==============================================================================
+        # SECCIÓN 3: PARAMETROS PLC
+        # ==============================================================================
+        self.TIEMPO_CONFIRMACION = 3.0   
+        self.PUNTOS_MINIMOS = 5         #30 original
+        self.ANCHO_MIN_CAMION = 0.2      #2.0 original 
+        self.ALTO_MIN_CAMION = 0.2       #1.5 original
+
+        # ==========================================
+        # CONEXIÓN ROS
+        # ==========================================
+        self.create_subscription(LaserScan, '/scan_distancia', self.callback_longitudinal, 10)
+        self.create_subscription(LaserScan, '/scan_estructura', self.callback_estructura, 10)
+
+        # Variables internas (Memoria del sistema)
+        self.es_camion_valido = False  
+        self.memoria_perfil_ok = False # <--- EL ENCLAVAMIENTO (LATCH)
+        self.esta_en_posicion = False  
+        self.estado_sistema = "ESPERANDO"
+        self.timer_inicio = None
+        
+        # Buffers gráficos
+        self.puntos_long = np.zeros((0, 3))
+        self.puntos_estruc = np.zeros((0, 3))
+        self.new_data = False
+        self.actualizar_caja = False
+
+        # ==========================================
+        # INTERFAZ GRÁFICA & BOTONERA
+        # ==========================================
+        print(">>> VISUALIZADOR MODO MANUAL - ACTUALIZADO <<<")
+        print("CONTROLES: [1]=20 Pies | [2]=40 Pies | [C]=Carga (Chasis) | [D]=Descarga (Contenedor)")
+        
+        self.vis = o3d.visualization.VisualizerWithKeyCallback()
+        self.vis.create_window(window_name="SIMULACION MANUAL STS", width=1280, height=720)
+        self.vis.get_render_option().background_color = np.asarray([0.1, 0.1, 0.1])
+        self.vis.get_render_option().point_size = 3.0
+
+        # Registrar teclas
+        self.vis.register_key_callback(ord("1"), self.btn_set_20)
+        self.vis.register_key_callback(ord("2"), self.btn_set_40)
+        self.vis.register_key_callback(ord("C"), self.btn_set_carga)
+        self.vis.register_key_callback(ord("D"), self.btn_set_descarga)
+
+        # Geometrías
+        self.pcd_long = o3d.geometry.PointCloud()
+        self.pcd_estruc = o3d.geometry.PointCloud()
+
+        self.box_target = o3d.geometry.AxisAlignedBoundingBox(
+            min_bound=np.array(self.zona_target['min']),
+            max_bound=np.array(self.zona_target['max'])
+        )
+        self.box_target.color = [1, 0, 0] 
+
+        self.box_profile = o3d.geometry.AxisAlignedBoundingBox(
+            min_bound=np.array(self.ZONA_PERFIL['min']),
+            max_bound=np.array(self.ZONA_PERFIL['max'])
+        )
+        self.box_profile.color = [0, 0, 1] 
+
+        self.vis.add_geometry(self.box_target)
+        self.vis.add_geometry(self.box_profile)
+        self.vis.add_geometry(self.crear_suelo()) 
+        self.vis.add_geometry(self.pcd_long)
+        self.vis.add_geometry(self.pcd_estruc)
+        
+        # RECUPERANDO LAS ESFERAS (VISUALIZACIÓN DE SENSORES)
+        s1 = o3d.geometry.TriangleMesh.create_sphere(radius=0.3)
+        s1.paint_uniform_color([1, 0.5, 0]); s1.translate(self.CFG_LONG['pos'])
+        self.vis.add_geometry(s1)
+
+        s2 = o3d.geometry.TriangleMesh.create_sphere(radius=0.3)
+        s2.paint_uniform_color([0, 1, 1]); s2.translate(self.CFG_ESTRUC['pos'])
+        self.vis.add_geometry(s2)
+        
         self.configurar_camara()
         self.running = True
 
-    # =========================================================
-    # 🔥 CALLBACK 1: CEREBRO DE LA GRÚA (Recibe datos API)
-    # =========================================================
-    def callback_grua_api(self, msg):
-        try:
-            # 1. Decodificar el mensaje que viene de client_API.py
-            data = json.loads(msg.data)
-            
-            # 2. Extraer datos (usando .get para seguridad)
-            size_raw = data.get("spreaderSize", 40) # Si falla, asume 40
-            self.grua_trolley = data.get("trolleyPos", "N/A")
-            self.grua_twistlock = data.get("spreaderTwistlock", "N/A")
+    # ==========================================
+    # FUNCIONES DE LOS BOTONES
+    # ==========================================
+    def btn_set_20(self, vis):
+        print(">>> BOTÓN: 20 PIES")
+        self.modo_actual = '20'
+        self.zona_target = self.DB_GEOMETRIA['20']
+        self.reset_sistema()
+        return False
 
-            # 3. Lógica de selección de Caja (20 vs 40)
-            # Convertimos a string para comparar con nuestras llaves '20' o '40'
-            modo_nuevo = str(size_raw)
+    def btn_set_40(self, vis):
+        print(">>> BOTÓN: 40 PIES")
+        self.modo_actual = '40'
+        self.zona_target = self.DB_GEOMETRIA['40']
+        self.reset_sistema()
+        return False
+
+    def btn_set_carga(self, vis):
+        print(">>> BOTÓN: CARGA (Buscando Chasis < 1.7m)")
+        self.modo_operacion = "CARGA"
+        self.reset_sistema()
+        return False
+
+    def btn_set_descarga(self, vis):
+        print(">>> BOTÓN: DESCARGA (Caja Alta)")
+        self.modo_operacion = "DESCARGA"
+        self.reset_sistema()
+        return False
+
+    def reset_sistema(self):
+        self.actualizar_caja = True
+        self.estado_sistema = "ESPERANDO"
+        self.timer_inicio = None
+        self.box_target.color = [1, 0, 0]
+        # NOTA: Al cambiar de modo manualmente, también reseteamos la memoria por seguridad
+        self.memoria_perfil_ok = False 
+
+    # ==========================================
+    # LÓGICA DE SENSORES
+    # ==========================================
+    def callback_longitudinal(self, msg):
+        points = self.laser_to_xyz(msg, self.CFG_LONG)
+        self.puntos_long = points
+        
+        min_b = np.array(self.zona_target['min'])
+        max_b = np.array(self.zona_target['max'])
+        puntos_validos = 0
+
+        # --- LÓGICA DE POSICIONAMIENTO ---
+        if self.modo_operacion == "DESCARGA":
+            # MODO CAJA ALTA: La caja ahora está elevada (Z=1.2 a 4.5)
+            # El láser debe ver el contenedor en esa zona para validar.
+            mask = np.all((points >= min_b) & (points <= max_b), axis=1)
+            puntos_validos = np.sum(mask)
+
+        elif self.modo_operacion == "CARGA":
+            # MODO CHASIS (FILTRO DE CABINA)
+            # 1. Filtramos X e Y (Dentro de la zona de estacionamiento)
+            mask_xy = (points[:,0] >= min_b[0]) & (points[:,0] <= max_b[0]) & \
+                      (points[:,1] >= min_b[1]) & (points[:,1] <= max_b[1])
+            puntos_zona = points[mask_xy]
             
-            # Solo si el spreader cambió de tamaño, actualizamos la caja
-            if modo_nuevo in self.DB_GEOMETRIA and modo_nuevo != self.modo_actual:
-                print(f"\n>>> [GRÚA] CAMBIO DE SPREADER DETECTADO: {modo_nuevo} PIES <<<")
-                self.modo_actual = modo_nuevo
-                self.zona_actual = self.DB_GEOMETRIA[modo_nuevo]
-                self.actualizar_caja = True # Avisamos al loop gráfico
+            # 2. FILTRO DE ALTURA ESTRICTO:
+            # Solo aceptamos puntos entre 0.6m y 1.7m.
+            # Todo lo que sea > 1.7m (Cabina) se descarta.
+            mask_z = (puntos_zona[:,2] > self.CHASIS_VACIO['alto_min']) & \
+                     (puntos_zona[:,2] < self.CHASIS_VACIO['alto_max'])
+            
+            puntos_validos = np.sum(mask_z)
+
+        # Umbral de sensibilidad
+        umbral = self.PUNTOS_MINIMOS if self.modo_operacion == "DESCARGA" else (self.PUNTOS_MINIMOS / 2)
+        
+        if puntos_validos > umbral: 
+            self.esta_en_posicion = True
+        else: 
+            self.esta_en_posicion = False
+        
+        # LÓGICA DE RESET AUTOMÁTICO (Fin de Ciclo)
+        if puntos_validos < 5: 
+            if self.memoria_perfil_ok == True:
+                print(">>> [RESET] ZONA VACÍA - SISTEMA REARMADO <<<")
+                self.memoria_perfil_ok = False
+
+        self.evaluar_logica_general()
+        self.new_data = True
+
+    def callback_estructura(self, msg):
+        points = self.laser_to_xyz(msg, self.CFG_ESTRUC)
+        self.puntos_estruc = points
+
+        min_b = np.array(self.ZONA_PERFIL['min'])
+        max_b = np.array(self.ZONA_PERFIL['max'])
+        mask = np.all((points >= min_b) & (points <= max_b), axis=1)
+        objeto_puntos = points[mask]
+
+        if len(objeto_puntos) > 20:
+            ancho = np.max(objeto_puntos[:, 1]) - np.min(objeto_puntos[:, 1])
+            alto  = np.max(objeto_puntos[:, 2]) - np.min(objeto_puntos[:, 2])
+            
+            if self.modo_operacion == "DESCARGA":
+                # En descarga, esperamos ver algo grande (Contenedor o camión alto)
+                if ancho > self.ANCHO_MIN_CAMION and alto > self.ALTO_MIN_CAMION: 
+                    self.es_camion_valido = True
+                else: 
+                    self.es_camion_valido = False
+            
+            elif self.modo_operacion == "CARGA":
+                # En carga, esperamos chasis bajo (< 1.7m)
+                condicion_ancho = ancho > self.CHASIS_VACIO['ancho_min']
+                condicion_alto  = (alto > 0.6) and (alto < 2.0) # Tolerancia leve en perfil
                 
-                # Reseteamos validación porque cambió la condición
-                self.estado_validacion = "VACIO"
-                self.timer_inicio = None
-                self.box_visual.color = [1, 0, 0]
+                if condicion_ancho and condicion_alto:
+                    self.es_camion_valido = True
+                else:
+                    self.es_camion_valido = False
+        else:
+            self.es_camion_valido = False
 
-        except json.JSONDecodeError:
-            print("Error recibiendo datos de la grúa")
+        # LÓGICA DE ENCLAVAMIENTO (LATCH)
+        if self.es_camion_valido == True:
+            self.memoria_perfil_ok = True
 
-    # =========================================================
-    # 🔥 CALLBACK 2: OJOS DEL SISTEMA (Recibe Láser)
-    # =========================================================
-    def callback_sensor_laser(self, msg):
-        try:
-            points = self.laser_to_xyz(msg)
-            es_camion, largo = self.validar_presencia(points)
+        self.evaluar_logica_general()
+        self.new_data = True
 
-            # Lógica de Semáforo (Igual que antes)
-            if es_camion and largo > self.LONGITUD_MINIMA:
-                if self.estado_validacion == "VACIO":
-                    self.estado_validacion = "VALIDANDO"
-                    self.timer_inicio = time.time()
-                    print(f"... Detectando chasis ({largo:.1f}m) ... Spreader: {self.modo_actual}' ...")
-                    self.box_visual.color = [1, 1, 0] # AMARILLO
+    def evaluar_logica_general(self):
+        # COMPUERTA AND CON MEMORIA
+        condicion_segura = self.memoria_perfil_ok and self.esta_en_posicion
 
-                elif self.estado_validacion == "VALIDANDO":
-                    if (time.time() - self.timer_inicio) >= self.TIEMPO_CONFIRMACION:
-                        self.estado_validacion = "CONFIRMADO"
-                        print(f">>> [OK] CAMIÓN POSICIONADO PARA {self.modo_actual} PIES <<<")
-                        print(f"    (Trolley: {self.grua_trolley} | Candados: {self.grua_twistlock})")
-                        self.box_visual.color = [0, 1, 0] # VERDE
+        if condicion_segura:
+            if self.estado_sistema == "ESPERANDO":
+                self.estado_sistema = "VALIDANDO"
+                self.timer_inicio = time.time()
+                self.box_target.color = [1, 1, 0] 
 
-                elif self.estado_validacion == "CONFIRMADO":
-                    self.box_visual.color = [0, 1, 0]
-            else:
-                if self.estado_validacion == "CONFIRMADO":
-                    print(">>> CAMIÓN SALIENDO... <<<")
-                self.estado_validacion = "VACIO"
-                self.timer_inicio = None
-                self.box_visual.color = [1, 0, 0]
+            elif self.estado_sistema == "VALIDANDO":
+                if (time.time() - self.timer_inicio) >= self.TIEMPO_CONFIRMACION:
+                    self.estado_sistema = "CONFIRMADO"
+                    print(f">>> [OK] CAMIÓN {self.modo_actual} PIES LISTO ({self.modo_operacion}) <<<")
+                    self.box_target.color = [0, 1, 0] 
 
-            self.pcd_buffer.points = o3d.utility.Vector3dVector(points)
-            self.pcd_buffer.paint_uniform_color([0, 1, 1])
-            self.new_data = True
-        except Exception: pass
+        else:
+            if self.estado_sistema == "CONFIRMADO": 
+                print(">>> CAMIÓN SALIENDO... <<<")
+            self.estado_sistema = "ESPERANDO"
+            self.timer_inicio = None
+            self.box_target.color = [1, 0, 0] 
 
-    # --- FUNCIONES MATEMÁTICAS (NO TOCAR) ---
-    def laser_to_xyz(self, msg):
-        cfg = self.CFG_SENSOR
+    # ==========================================
+    # UTILIDADES MATEMÁTICAS
+    # ==========================================
+    def laser_to_xyz(self, msg, cfg):
         angles = np.arange(msg.angle_min, msg.angle_max, msg.angle_increment)
         ranges = np.array(msg.ranges)
         min_len = min(len(angles), len(ranges))
         angles = angles[:min_len]; ranges = ranges[:min_len]
 
-        valid = (ranges > 0.1) & (ranges > cfg['dist_min']) & (ranges < cfg['dist_max'])
+        lim_min_rad = np.radians(cfg['ang_min'])
+        lim_max_rad = np.radians(cfg['ang_max'])
+
+        valid = (ranges > 0.1) & \
+                (ranges > cfg['dist_min']) & (ranges < cfg['dist_max']) & \
+                (angles >= lim_min_rad) & (angles <= lim_max_rad)
+
         r = ranges[valid]; a = angles[valid]
         if len(r) == 0: return np.zeros((0, 3))
 
         x = r * np.cos(a); y = r * np.sin(a); z = np.zeros_like(x)
 
-        if cfg['roll']!=0: c,s=np.cos(cfg['roll']),np.sin(cfg['roll']); y_n=y*c-z*s; z_n=y*s+z*c; y=y_n; z=z_n
-        if cfg['pitch']!=0: c,s=np.cos(cfg['pitch']),np.sin(cfg['pitch']); x_n=x*c-z*s; z_n=x*s+z*c; x=x_n; z=z_n
-        if cfg['yaw']!=0: c,s=np.cos(cfg['yaw']),np.sin(cfg['yaw']); x_n=x*c-y*s; y_n=x*s+y*c; x=x_n; y=y_n
-        return np.vstack((x + cfg['pos'][0], y + cfg['pos'][1], z + cfg['pos'][2])).T
+        if cfg['roll'] != 0:
+            c, s = np.cos(cfg['roll']), np.sin(cfg['roll'])
+            y_n = y * c - z * s; z_n = y * s + z * c; y, z = y_n, z_n
+        if cfg['pitch'] != 0:
+            c, s = np.cos(cfg['pitch']), np.sin(cfg['pitch'])
+            x_n = x * c - z * s; z_n = x * s + z * c; x, z = x_n, z_n
+        if cfg['yaw'] != 0:
+            c, s = np.cos(cfg['yaw']), np.sin(cfg['yaw'])
+            x_n = x * c - y * s; y_n = x * s + y * c; x, y = x_n, y_n
 
-    def validar_presencia(self, points):
-        min_b = np.array(self.zona_actual['min'])
-        max_b = np.array(self.zona_actual['max'])
-        mask = (points[:, 0] >= min_b[0]) & (points[:, 0] <= max_b[0]) & \
-               (points[:, 1] >= min_b[1]) & (points[:, 1] <= max_b[1]) & \
-               (points[:, 2] >= min_b[2]) & (points[:, 2] <= max_b[2])
-        puntos_dentro = points[mask]
-        if len(puntos_dentro) < 20: return False, 0.0
-        return True, (np.max(puntos_dentro[:, 0]) - np.min(puntos_dentro[:, 0]))
+        return np.vstack((x + cfg['pos'][0], y + cfg['pos'][1], z + cfg['pos'][2])).T
 
     def crear_suelo(self):
         size=40; step=2; points=[]; lines=[]
@@ -198,27 +341,28 @@ class VisualizadorSTS(Node):
 
     def configurar_camara(self):
         ctr = self.vis.get_view_control()
-        ctr.set_lookat([0,0,0]); ctr.set_front([0,-0.8,0.8]); ctr.set_up([0,0,1]); ctr.set_zoom(0.5)
+        ctr.set_lookat([0,0,0]); ctr.set_front([0.0, -0.8, 0.8]); ctr.set_up([0,0,1]); ctr.set_zoom(0.5)
 
 def main(args=None):
     rclpy.init(args=args)
-    gui = VisualizadorSTS()
+    gui = VisualizadorSTS_Simulador()
     t = threading.Thread(target=rclpy.spin, args=(gui,), daemon=True)
     t.start()
-
     try:
         while gui.running:
-            # 1. Si llegaron datos del LÁSER, actualizar nube
             if gui.new_data:
-                gui.vis.update_geometry(gui.pcd_buffer)
-                gui.vis.update_geometry(gui.box_visual) # Mantener color actualizado
+                gui.pcd_long.points = o3d.utility.Vector3dVector(gui.puntos_long)
+                gui.pcd_long.paint_uniform_color([1, 0.5, 0]) 
+                gui.pcd_estruc.points = o3d.utility.Vector3dVector(gui.puntos_estruc)
+                gui.pcd_estruc.paint_uniform_color([0, 1, 1])
+                gui.vis.update_geometry(gui.pcd_long)
+                gui.vis.update_geometry(gui.pcd_estruc)
+                gui.vis.update_geometry(gui.box_target) 
                 gui.new_data = False
-            
-            # 2. Si llegaron datos de la GRÚA que requieren cambiar la caja
             if gui.actualizar_caja:
-                gui.box_visual.min_bound = np.array(gui.zona_actual['min'])
-                gui.box_visual.max_bound = np.array(gui.zona_actual['max'])
-                gui.vis.update_geometry(gui.box_visual)
+                gui.box_target.min_bound = np.array(gui.zona_target['min'])
+                gui.box_target.max_bound = np.array(gui.zona_target['max'])
+                gui.vis.update_geometry(gui.box_target)
                 gui.actualizar_caja = False
             
             gui.vis.poll_events()
