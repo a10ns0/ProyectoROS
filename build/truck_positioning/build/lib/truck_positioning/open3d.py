@@ -37,23 +37,34 @@ class VisualizadorSTS_Simulador(Node):
         self.CHASIS_VACIO = { 'alto_min': 0.1, 'alto_max': 2.0, 'ancho_min': 0.2 }
         self.modo_operacion = "DESCARGA" 
 
+       # ==============================================================================
+        # SECCIÓN 2: HARDWARE (SENSORES) - CALIBRADOS CON SIMULADOR
         # ==============================================================================
-        # SECCIÓN 2: HARDWARE (SENSORES)
-        # ==============================================================================
-        # He ajustado CFG_S1 (ESTRUCTURA) para que coincida con tu SIMULADOR (12.5m altura)
-        # Si usas el simulador, esto permitirá ver los puntos.
+        
+        # --- SENSOR 1: ESTRUCTURA (El que mira el perfil) ---
+        # En tu simulador (TruckSimulator) 'sensor1_pos_x' es 0.0 y altura 12.5
         self.CFG_ESTRUC = {
-            'pos': [-5.8, 0.0, 12.5],  # <--- AJUSTADO A 12.5m (Simulador)
-            'dist_min': 0.1, 'dist_max': 20.0, # <--- AUMENTADO (Para ver suelo)
-            'ang_min': -45.0, 'ang_max': 45.0, 
-            'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(0)
+            'pos': [0.0, 0.0, 12.5],  # <--- CORREGIDO: X=0.0 (Origen), Z=12.5 (Altura simulador)
+            'dist_min': 0.1, 
+            'dist_max': 20.0,         # Rango amplio para ver el suelo desde 12.5m
+            'ang_min': -45.0, 
+            'ang_max': 45.0, 
+            'pitch': np.radians(-90), 
+            'yaw': np.radians(0), 
+            'roll': np.radians(0)
         }
         
+        # --- SENSOR 2: LONGITUDINAL (El que mide distancia/posición) ---
+        # En tu simulador (TruckSimulator) 'sensor2_pos_x' es 22.38 y altura 12.5
         self.CFG_LONG = {
-            'pos': [8.0, 0.0, 4.0],        
-            'dist_min': 0.1, 'dist_max': 12.0,
-            'ang_min': -95.0, 'ang_max': 0, 
-            'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(90) 
+            'pos': [22.38, 0.0, 12.5], # <--- CORREGIDO: X=22.38, Z=12.5
+            'dist_min': 0.1, 
+            'dist_max': 20.0,          # Aumentado a 20m para que alcance a ver el camión desde arriba
+            'ang_min': -95.0, 
+            'ang_max': 0, 
+            'pitch': np.radians(-90), 
+            'yaw': np.radians(0), 
+            'roll': np.radians(90) 
         }
 
         # Parametros PLC

@@ -11,17 +11,22 @@ import time
 
 class VisualizadorSTS_Simulador(Node):
     def __init__(self):
-        super().__init__('visualizador_sts_manual')
+        super().__init__('visualizador_sts_hmi')
         
         # ==========================================
-        # NUEVO: LISTENER DE TF (Para saber donde esta el camion)
+        # 1. RECEPCIÓN DE DATOS (ANTENAS)
         # ==========================================
+        # Listener de TF (Para ver moverse el camión 3D)
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
-        self.truck_last_x = -15.0 # Posición inicial conocida
+        self.truck_last_x = -15.0 
+
+        # Suscripción a Sensores
+        self.create_subscription(LaserScan, '/scan_distancia', self.callback_longitudinal, 10)
+        self.create_subscription(LaserScan, '/scan_estructura', self.callback_estructura, 10)
 
         # ==============================================================================
-        # SECCIÓN 1: GEOMETRÍA (CAJAS VIRTUALES)
+        # 2. CONFIGURACIÓN DE SETPOINTS (CAJAS VIRTUALES)
         # ==============================================================================
         self.DB_GEOMETRIA = {
             '40': { 'min': [-6.0, -1.2, 1.0], 'max': [ 6.0,  1.2, 4.5], 'desc': "40 PIES (ALTO)" },
@@ -29,147 +34,110 @@ class VisualizadorSTS_Simulador(Node):
         }
         self.ZONA_PERFIL = { 'min': [-6.3, -2.5, 0.0], 'max': [ -1.0,  2.5, 5.0] }
 
-        # Estado inicial
+        # Variables de Lógica
         self.modo_actual = '40'
         self.zona_target = self.DB_GEOMETRIA['40']
-        
-        # Filtros
         self.CHASIS_VACIO = { 'alto_min': 0.1, 'alto_max': 2.0, 'ancho_min': 0.2 }
         self.modo_operacion = "DESCARGA" 
 
-        # ==============================================================================
-        # SECCIÓN 2: HARDWARE (SENSORES)
-        # ==============================================================================
-        # He ajustado CFG_S1 (ESTRUCTURA) para que coincida con tu SIMULADOR (12.5m altura)
-        # Si usas el simulador, esto permitirá ver los puntos.
-        self.CFG_ESTRUC = {
-            'pos': [-5.8, 0.0, 12.5],  # <--- AJUSTADO A 12.5m (Simulador)
-            'dist_min': 0.1, 'dist_max': 20.0, # <--- AUMENTADO (Para ver suelo)
-            'ang_min': -45.0, 'ang_max': 45.0, 
-            'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(0)
-        }
-        
-        self.CFG_LONG = {
-            'pos': [8.0, 0.0, 4.0],        
-            'dist_min': 0.1, 'dist_max': 12.0,
-            'ang_min': -95.0, 'ang_max': 0, 
-            'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(90) 
-        }
-
-        # Parametros PLC
-        self.TIEMPO_CONFIRMACION = 3.0   
-        self.PUNTOS_MINIMOS = 5         
-        self.ANCHO_MIN_CAMION = 0.2      
-        self.ALTO_MIN_CAMION = 0.2       
-
-        # ==========================================
-        # CONEXIÓN ROS
-        # ==========================================
-        self.create_subscription(LaserScan, '/scan_distancia', self.callback_longitudinal, 10)
-        self.create_subscription(LaserScan, '/scan_estructura', self.callback_estructura, 10)
-
-        # Variables internas
+        # Variables de Memoria (PLC)
         self.es_camion_valido = False  
         self.memoria_perfil_ok = False 
         self.esta_en_posicion = False  
         self.estado_sistema = "ESPERANDO"
         self.timer_inicio = None
         
+        # Parámetros de Sensibilidad
+        self.TIEMPO_CONFIRMACION = 2.0   
+        self.PUNTOS_MINIMOS = 2          
+        self.ANCHO_MIN_CAMION = 0.2      
+        self.ALTO_MIN_CAMION = 0.2        
+
+        # ==============================================================================
+        # 3. CONFIGURACIÓN DE HARDWARE (POSICIÓN SENSORES EN PANTALLA)
+        # ==============================================================================
+        # ATENCIÓN: Estas coordenadas coinciden con el 'simulador_fisicas.py'
+        
+        # Sensor 1 (Perfil/Estructura) - MODIFICADO
+        self.CFG_ESTRUC = {
+            'pos': [-5.8, 0.0, 12.5],  
+            'dist_min': 0.1, 'dist_max': 20.0, 
+            'ang_min': -45.0, 'ang_max': 45.0, 
+            'pitch': np.radians(-90), 
+            'yaw': np.radians(90),     # <--- CAMBIO AQUÍ (Gira 90 grados el sensor)
+            'roll': np.radians(0)
+        }
+        
+        # Sensor 2 (Posición/Distancia) - Está más adelante X=22.38
+        self.CFG_LONG = {
+            'pos': [10, 0.0, 12.5],         
+            'dist_min': 0.1, 'dist_max': 20.0,
+            'ang_min': -95.0, 'ang_max': 0, 
+            'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(90) 
+        }
+
         # Buffers gráficos
-        self.puntos_long = np.zeros((0, 3))
-        self.puntos_estruc = np.zeros((0, 3))
-        self.new_data = False
-        self.actualizar_caja = False
+        self.puntos_long = np.zeros((0, 3)); self.puntos_estruc = np.zeros((0, 3))
+        self.new_data = False; self.actualizar_caja = False
 
         # ==========================================
-        # INTERFAZ GRÁFICA
+        # 4. INICIO DE INTERFAZ GRÁFICA 3D
         # ==========================================
+        self.iniciar_gui()
+        self.running = True
+
+    def iniciar_gui(self):
         self.vis = o3d.visualization.VisualizerWithKeyCallback()
-        self.vis.create_window(window_name="SIMULACION MANUAL STS", width=1280, height=720)
+        self.vis.create_window(window_name="HMI OPERADOR STS", width=1280, height=720)
         self.vis.get_render_option().background_color = np.asarray([0.1, 0.1, 0.1])
-        self.vis.get_render_option().point_size = 3.0
+        self.vis.get_render_option().point_size = 4.0
 
-        # Registrar teclas
+        # Teclas
         self.vis.register_key_callback(ord("1"), self.btn_set_20)
         self.vis.register_key_callback(ord("2"), self.btn_set_40)
         self.vis.register_key_callback(ord("C"), self.btn_set_carga)
         self.vis.register_key_callback(ord("D"), self.btn_set_descarga)
 
-        # Geometrías Básicas
-        self.pcd_long = o3d.geometry.PointCloud()
-        self.pcd_estruc = o3d.geometry.PointCloud()
-
+        # Geometrías (Cajas)
         self.box_target = o3d.geometry.AxisAlignedBoundingBox(
-            min_bound=np.array(self.zona_target['min']),
-            max_bound=np.array(self.zona_target['max'])
-        )
+            min_bound=np.array(self.zona_target['min']), max_bound=np.array(self.zona_target['max']))
         self.box_target.color = [1, 0, 0] 
 
         self.box_profile = o3d.geometry.AxisAlignedBoundingBox(
-            min_bound=np.array(self.ZONA_PERFIL['min']),
-            max_bound=np.array(self.ZONA_PERFIL['max'])
-        )
+            min_bound=np.array(self.ZONA_PERFIL['min']), max_bound=np.array(self.ZONA_PERFIL['max']))
         self.box_profile.color = [0, 0, 1] 
 
-        self.vis.add_geometry(self.box_target)
-        self.vis.add_geometry(self.box_profile)
-        self.vis.add_geometry(self.crear_suelo()) 
-        self.vis.add_geometry(self.pcd_long)
-        self.vis.add_geometry(self.pcd_estruc)
-        
-        # Esferas sensores
-        s1 = o3d.geometry.TriangleMesh.create_sphere(radius=0.3)
-        s1.paint_uniform_color([1, 0.5, 0]); s1.translate(self.CFG_LONG['pos'])
-        self.vis.add_geometry(s1)
+        # Nubes de puntos
+        self.pcd_long = o3d.geometry.PointCloud()
+        self.pcd_estruc = o3d.geometry.PointCloud()
 
-        s2 = o3d.geometry.TriangleMesh.create_sphere(radius=0.3)
-        s2.paint_uniform_color([0, 1, 1]); s2.translate(self.CFG_ESTRUC['pos'])
-        self.vis.add_geometry(s2)
-
-        # ==========================================
-        # NUEVO: MODELO 3D DEL CAMIÓN (SIMULADO)
-        # ==========================================
-        # Replicamos las dimensiones de tu URDF
-        # 1. Chasis (Azul) - 12m x 2.4m x 1.2m
+        # Generar Camión 3D (Mallas)
         self.mesh_chasis = o3d.geometry.TriangleMesh.create_box(width=12.0, height=2.4, depth=1.2)
-        self.mesh_chasis.paint_uniform_color([0.0, 0.0, 0.8]) # Azul
-        # Ajustar origen del cubo (Open3D crea el cubo desde la esquina, lo centramos en Y)
-        self.mesh_chasis.translate([0.0, -1.2, 0.0]) 
+        self.mesh_chasis.paint_uniform_color([0.0, 0.0, 0.8]); self.mesh_chasis.translate([0.0, -1.2, 0.0])
         
-        # 2. Cabina (Roja) - 2.5m x 2.4m x 3.0m
         self.mesh_cabina = o3d.geometry.TriangleMesh.create_box(width=2.5, height=2.4, depth=3.0)
-        self.mesh_cabina.paint_uniform_color([0.8, 0.0, 0.0]) # Rojo
-        # La cabina va al final del chasis
-        self.mesh_cabina.translate([9.5, -1.2, 0.0])
+        self.mesh_cabina.paint_uniform_color([0.8, 0.0, 0.0]); self.mesh_cabina.translate([9.5, -1.2, 0.0])
 
         # Posicion inicial lejos
-        self.mesh_chasis.translate([-15.0, 0, 0])
-        self.mesh_cabina.translate([-15.0, 0, 0])
+        self.mesh_chasis.translate([-15.0, 0, 0]); self.mesh_cabina.translate([-15.0, 0, 0])
 
-        self.vis.add_geometry(self.mesh_chasis)
-        self.vis.add_geometry(self.mesh_cabina)
+        # Esferas sensores (Visualización)
+        s1 = o3d.geometry.TriangleMesh.create_sphere(radius=0.4)
+        s1.paint_uniform_color([1, 0.5, 0]); s1.translate(self.CFG_LONG['pos'])
+        
+        s2 = o3d.geometry.TriangleMesh.create_sphere(radius=0.4)
+        s2.paint_uniform_color([0, 1, 1]); s2.translate(self.CFG_ESTRUC['pos'])
+
+        # Agregar todo
+        self.vis.add_geometry(self.box_target); self.vis.add_geometry(self.box_profile)
+        self.vis.add_geometry(self.crear_suelo()); self.vis.add_geometry(self.pcd_long)
+        self.vis.add_geometry(self.pcd_estruc); self.vis.add_geometry(self.mesh_chasis)
+        self.vis.add_geometry(self.mesh_cabina); self.vis.add_geometry(s1); self.vis.add_geometry(s2)
         
         self.configurar_camara()
-        self.running = True
 
     # ==========================================
-    # FUNCIONES DE LOS BOTONES
-    # ==========================================
-    def btn_set_20(self, vis):
-        self.modo_actual = '20'; self.zona_target = self.DB_GEOMETRIA['20']; self.reset_sistema(); return False
-    def btn_set_40(self, vis):
-        self.modo_actual = '40'; self.zona_target = self.DB_GEOMETRIA['40']; self.reset_sistema(); return False
-    def btn_set_carga(self, vis):
-        self.modo_operacion = "CARGA"; self.reset_sistema(); return False
-    def btn_set_descarga(self, vis):
-        self.modo_operacion = "DESCARGA"; self.reset_sistema(); return False
-
-    def reset_sistema(self):
-        self.actualizar_caja = True; self.estado_sistema = "ESPERANDO"; self.timer_inicio = None
-        self.box_target.color = [1, 0, 0]; self.memoria_perfil_ok = False 
-
-    # ==========================================
-    # LÓGICA DE SENSORES
+    # LÓGICA DE CONTROL (CALLBACKS)
     # ==========================================
     def callback_longitudinal(self, msg):
         points = self.laser_to_xyz(msg, self.CFG_LONG)
@@ -190,7 +158,8 @@ class VisualizadorSTS_Simulador(Node):
         umbral = self.PUNTOS_MINIMOS if self.modo_operacion == "DESCARGA" else (self.PUNTOS_MINIMOS / 2)
         self.esta_en_posicion = (puntos_validos > umbral)
         
-        if puntos_validos < 5 and self.memoria_perfil_ok:
+        # Reset si se vacía la zona
+        if puntos_validos < 2 and self.memoria_perfil_ok:
             print(">>> [RESET] ZONA VACÍA - SISTEMA REARMADO <<<")
             self.memoria_perfil_ok = False
 
@@ -205,7 +174,7 @@ class VisualizadorSTS_Simulador(Node):
         mask = np.all((points >= min_b) & (points <= max_b), axis=1)
         objeto_puntos = points[mask]
 
-        if len(objeto_puntos) > 20:
+        if len(objeto_puntos) > 5:
             ancho = np.max(objeto_puntos[:, 1]) - np.min(objeto_puntos[:, 1])
             alto  = np.max(objeto_puntos[:, 2]) - np.min(objeto_puntos[:, 2])
             
@@ -233,19 +202,23 @@ class VisualizadorSTS_Simulador(Node):
             self.estado_sistema = "ESPERANDO"; self.timer_inicio = None; self.box_target.color = [1, 0, 0] 
 
     # ==========================================
-    # UTILIDADES
+    # UTILIDADES Y BOTONES
     # ==========================================
+    def btn_set_20(self, vis): self.modo_actual='20'; self.zona_target=self.DB_GEOMETRIA['20']; self.reset_sistema(); return False
+    def btn_set_40(self, vis): self.modo_actual='40'; self.zona_target=self.DB_GEOMETRIA['40']; self.reset_sistema(); return False
+    def btn_set_carga(self, vis): self.modo_operacion="CARGA"; self.reset_sistema(); return False
+    def btn_set_descarga(self, vis): self.modo_operacion="DESCARGA"; self.reset_sistema(); return False
+    def reset_sistema(self): self.actualizar_caja=True; self.estado_sistema="ESPERANDO"; self.timer_inicio=None; self.box_target.color=[1, 0, 0]; self.memoria_perfil_ok=False 
+
     def laser_to_xyz(self, msg, cfg):
         angles = np.arange(msg.angle_min, msg.angle_max, msg.angle_increment)
         ranges = np.array(msg.ranges)
         min_len = min(len(angles), len(ranges))
         angles = angles[:min_len]; ranges = ranges[:min_len]
-
         lim_min_rad = np.radians(cfg['ang_min']); lim_max_rad = np.radians(cfg['ang_max'])
         valid = (ranges > cfg['dist_min']) & (ranges < cfg['dist_max']) & (angles >= lim_min_rad) & (angles <= lim_max_rad)
         r = ranges[valid]; a = angles[valid]
         if len(r) == 0: return np.zeros((0, 3))
-
         x = r * np.cos(a); y = r * np.sin(a); z = np.zeros_like(x)
         if cfg['roll'] != 0: c, s = np.cos(cfg['roll']), np.sin(cfg['roll']); y_n = y * c - z * s; z_n = y * s + z * c; y, z = y_n, z_n
         if cfg['pitch'] != 0: c, s = np.cos(cfg['pitch']), np.sin(cfg['pitch']); x_n = x * c - z * s; z_n = x * s + z * c; x, z = x_n, z_n
@@ -274,56 +247,36 @@ def main(args=None):
     t.start()
     try:
         while gui.running:
-            # =========================================================
-            # NUEVO: ACTUALIZACIÓN DE POSICIÓN DEL CAMIÓN (ANIMACIÓN)
-            # =========================================================
+            # ANIMACIÓN DEL CAMIÓN (Usando datos de Transformada)
             try:
-                # Buscamos la transformación desde 'map' a 'base_link' (el camión)
-                # El '0' indica que queremos la transformación más reciente posible
                 now = rclpy.time.Time()
-                trans = gui.tf_buffer.lookup_transform('map', 'base_link', now)
-                
-                # Obtenemos la posición X actual del camión simulado
-                current_x = trans.transform.translation.x
-                
-                # Calculamos cuánto se movió desde el último frame
-                delta_x = current_x - gui.truck_last_x
-                
-                if abs(delta_x) > 0.001: # Si se movió
-                    # Movemos las mallas 3D
-                    gui.mesh_chasis.translate([delta_x, 0, 0])
-                    gui.mesh_cabina.translate([delta_x, 0, 0])
-                    
-                    # Actualizamos en el visualizador
-                    gui.vis.update_geometry(gui.mesh_chasis)
-                    gui.vis.update_geometry(gui.mesh_cabina)
-                    
-                    # Guardamos la posición para la siguiente resta
-                    gui.truck_last_x = current_x
-            except TransformException:
-                # Al principio puede fallar unos ms mientras llega la info
-                pass
+                if gui.tf_buffer.can_transform('map', 'base_link', now):
+                    trans = gui.tf_buffer.lookup_transform('map', 'base_link', now)
+                    current_x = trans.transform.translation.x
+                    delta_x = current_x - gui.truck_last_x
+                    if abs(delta_x) > 0.001:
+                        gui.mesh_chasis.translate([delta_x, 0, 0])
+                        gui.mesh_cabina.translate([delta_x, 0, 0])
+                        gui.vis.update_geometry(gui.mesh_chasis)
+                        gui.vis.update_geometry(gui.mesh_cabina)
+                        gui.truck_last_x = current_x
+            except Exception: pass
 
-            # Actualización de Nube de Puntos
+            # ACTUALIZACIÓN DE GRÁFICOS
             if gui.new_data:
                 gui.pcd_long.points = o3d.utility.Vector3dVector(gui.puntos_long)
                 gui.pcd_long.paint_uniform_color([1, 0.5, 0]) 
                 gui.pcd_estruc.points = o3d.utility.Vector3dVector(gui.puntos_estruc)
                 gui.pcd_estruc.paint_uniform_color([0, 1, 1])
-                gui.vis.update_geometry(gui.pcd_long)
-                gui.vis.update_geometry(gui.pcd_estruc)
-                gui.vis.update_geometry(gui.box_target) 
-                gui.new_data = False
+                gui.vis.update_geometry(gui.pcd_long); gui.vis.update_geometry(gui.pcd_estruc)
+                gui.vis.update_geometry(gui.box_target); gui.new_data = False
             
             if gui.actualizar_caja:
                 gui.box_target.min_bound = np.array(gui.zona_target['min'])
                 gui.box_target.max_bound = np.array(gui.zona_target['max'])
-                gui.vis.update_geometry(gui.box_target)
-                gui.actualizar_caja = False
+                gui.vis.update_geometry(gui.box_target); gui.actualizar_caja = False
             
-            gui.vis.poll_events()
-            gui.vis.update_renderer()
-            time.sleep(0.01)
+            gui.vis.poll_events(); gui.vis.update_renderer(); time.sleep(0.01)
     except KeyboardInterrupt: pass
     finally: gui.vis.destroy_window(); rclpy.shutdown()
 

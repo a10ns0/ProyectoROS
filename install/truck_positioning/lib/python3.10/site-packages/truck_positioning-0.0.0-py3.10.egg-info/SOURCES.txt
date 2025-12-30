@@ -25,10 +25,10 @@ truck_positioning/ejemplo.py
 truck_positioning/interfaz_camion.py
 truck_positioning/logic_node.py
 truck_positioning/monitor_dual.py
-truck_positioning/open3d.py
 truck_positioning/simple_truck_sim.py
 truck_positioning/sub_BD.py
 truck_positioning/visualizador_amarillo.py
+truck_positioning/visualizador_hmi.py
 truck_positioning/visualizador_perfil.py
 truck_positioning/visualizador_propio.py
 urdf/camion.urdf
