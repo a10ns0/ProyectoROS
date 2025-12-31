@@ -68,8 +68,8 @@ class VisualizadorSTS_Simulador(Node):
         }
         
         self.ZONA_PERFIL = { 
-            'min': [-6.3, -2.5, 0.0], 
-            'max': [ -1.0,  2.5, 5.0] 
+            'min': [-11, -2.5, 0.0], 
+            'max': [ -9.0,  2.5, 5.0] 
         }
 
         # Estado inicial
@@ -92,16 +92,16 @@ class VisualizadorSTS_Simulador(Node):
         # SECCIÓN 2: HARDWARE (SENSORES)
         # ==============================================================================
         self.CFG_LONG = {
-            'pos': [8.0, 0.0, 4.0],        
+            'pos': [10.2, 0.0, 12.5],        
             'dist_min': 0.1, 'dist_max': 20,
             'ang_min': -95.0, 'ang_max': 0, 
             'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(90) 
         }
 
         self.CFG_ESTRUC = {
-            'pos': [-5.8, 0.0, 12.5],       
-            'dist_min': 0.1, 'dist_max': 20,
-            'ang_min': -45.0, 'ang_max': 45.0, 
+            'pos': [-10.2, 11.19 , 12.5],       
+            'dist_min': 0.1, 'dist_max': 70,
+            'ang_min': -55.0, 'ang_max': 55.0, 
             'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(0)
         }
 
