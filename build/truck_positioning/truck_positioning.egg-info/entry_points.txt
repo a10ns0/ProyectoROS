@@ -7,6 +7,7 @@ lector = truck_positioning.ejemplo:main
 logic_node = truck_positioning.logic_node:main
 monitor_dual = truck_positioning.monitor_dual:main
 simple_truck_sim = truck_positioning.simple_truck_sim:main
+sistema_integrado = truck_positioning.sistema_integrado:main
 sub_BD = truck_positioning.sub_BD:main
 visualizador = truck_positioning.visualizador_perfil:main
 visualizador_amarillo = truck_positioning.visualizador_amarillo:main

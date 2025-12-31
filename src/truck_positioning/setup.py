@@ -39,6 +39,7 @@ setup(
 	    'sub_BD = truck_positioning.sub_BD:main',
 	    'camion_3D = truck_positioning.open3d:main',
 	    'simple_truck_sim = truck_positioning.simple_truck_sim:main',
+	    'sistema_integrado = truck_positioning.sistema_integrado:main',
         ],
     },
 )

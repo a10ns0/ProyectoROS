@@ -1,0 +1,68 @@
+[0.632s] Invoking command in '/home/nuc/Documentos/GitHub/ProyectoROS/src/truck_positioning': PYTHONPATH=/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/truck_positioning build --build-base /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build install --record /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/install.log --single-version-externally-managed install_data
+[0.880s] running egg_info
+[0.897s] writing ../../build/truck_positioning/truck_positioning.egg-info/PKG-INFO
+[0.897s] writing dependency_links to ../../build/truck_positioning/truck_positioning.egg-info/dependency_links.txt
+[0.898s] writing entry points to ../../build/truck_positioning/truck_positioning.egg-info/entry_points.txt
+[0.898s] writing requirements to ../../build/truck_positioning/truck_positioning.egg-info/requires.txt
+[0.898s] writing top-level names to ../../build/truck_positioning/truck_positioning.egg-info/top_level.txt
+[0.933s] reading manifest file '../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt'
+[0.935s] writing manifest file '../../build/truck_positioning/truck_positioning.egg-info/SOURCES.txt'
+[0.935s] running build
+[0.935s] running build_py
+[0.935s] copying truck_positioning/simple_truck_sim.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.935s] copying truck_positioning/visualizador_hmi.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.936s] copying truck_positioning/sub_BD.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.936s] copying truck_positioning/ejemplo.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.936s] copying truck_positioning/visualizador_amarillo.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.936s] copying truck_positioning/logic_node.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.937s] copying truck_positioning/visualizador_propio.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.937s] copying truck_positioning/monitor_dual.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.937s] copying truck_positioning/visualizador_perfil.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.937s] copying truck_positioning/calculador_distancia.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.937s] copying truck_positioning/cliente_API.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.938s] copying truck_positioning/sistema_integrado.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.938s] copying truck_positioning/interfaz_camion.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.938s] copying truck_positioning/__init__.py -> /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning
+[0.939s] running install
+[0.943s] running install_lib
+[0.960s] copying /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/logic_node.py -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+[0.960s] copying /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build/lib/truck_positioning/sistema_integrado.py -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning
+[0.961s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/simple_truck_sim.py to simple_truck_sim.cpython-310.pyc
+[0.962s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_hmi.py to visualizador_hmi.cpython-310.pyc
+[0.964s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/ejemplo.py to ejemplo.cpython-310.pyc
+[0.965s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_amarillo.py to visualizador_amarillo.cpython-310.pyc
+[0.965s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_propio.py to visualizador_propio.cpython-310.pyc
+[0.968s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/monitor_dual.py to monitor_dual.cpython-310.pyc
+[0.969s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_perfil.py to visualizador_perfil.cpython-310.pyc
+[0.970s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/open3d.py to open3d.cpython-310.pyc
+[0.973s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/calculador_distancia.py to calculador_distancia.cpython-310.pyc
+[0.973s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/cliente_API.py to cliente_API.cpython-310.pyc
+[0.974s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/sistema_integrado.py to sistema_integrado.cpython-310.pyc
+[0.976s] byte-compiling /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/interfaz_camion.py to interfaz_camion.cpython-310.pyc
+[0.977s] running install_data
+[0.977s] copying resource/truck_positioning -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/share/ament_index/resource_index/packages
+[0.977s] copying package.xml -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning
+[0.978s] copying launch/visualizador_perfil.py.launch.py -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning/launch
+[0.978s] copying launch/sensores_tf.launch.py -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning/launch
+[0.978s] copying launch/sensor_antiguo.launch.py -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning/launch
+[0.978s] copying launch/sensor_longitudinal.launch.py -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning/launch
+[0.978s] copying launch/sistema_completo.launch.py -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning/launch
+[0.979s] copying urdf/camion.urdf -> /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/share/truck_positioning/urdf
+[0.979s] running install_egg_info
+[0.996s] removing '/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning-0.0.0-py3.10.egg-info' (and everything under it)
+[0.996s] Copying ../../build/truck_positioning/truck_positioning.egg-info to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning-0.0.0-py3.10.egg-info
+[0.997s] running install_scripts
+[1.033s] Installing calculador_distancia script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.033s] Installing camion_3D script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.033s] Installing cliente_API script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.033s] Installing interfaz_camion script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.033s] Installing lector script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.033s] Installing logic_node script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.034s] Installing monitor_dual script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.034s] Installing simple_truck_sim script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.034s] Installing sistema_integrado script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.034s] Installing sub_BD script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.034s] Installing visualizador script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.034s] Installing visualizador_amarillo script to /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning
+[1.035s] writing list of installed files to '/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/install.log'
+[1.060s] Invoked command in '/home/nuc/Documentos/GitHub/ProyectoROS/src/truck_positioning' returned '0': PYTHONPATH=/home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/truck_positioning build --build-base /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/build install --record /home/nuc/Documentos/GitHub/ProyectoROS/build/truck_positioning/install.log --single-version-externally-managed install_data
