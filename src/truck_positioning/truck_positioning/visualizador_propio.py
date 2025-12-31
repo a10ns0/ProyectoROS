@@ -102,7 +102,7 @@ class VisualizadorSTS_Simulador(Node):
             'pos': [-10.2, 11.19 , 12.5],       
             'dist_min': 0.1, 'dist_max': 70,
             'ang_min': -55.0, 'ang_max': 55.0, 
-            'pitch': np.radians(-90), 'yaw': np.radians(0), 'roll': np.radians(0)
+            'pitch': np.radians(-90), 'yaw': np.radians(180), 'roll': np.radians(0)
         }
 
         # ==============================================================================
