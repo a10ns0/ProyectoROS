@@ -14,161 +14,142 @@ class TruckSimulator(Node):
         self.tf_broadcaster = TransformBroadcaster(self)
         self.pub_scan_estruc = self.create_publisher(LaserScan, '/scan_estructura', 10)
         self.pub_scan_long = self.create_publisher(LaserScan, '/scan_distancia', 10)
-        self.sub_cmd = self.create_subscription(String, '/truck_cmd', self.cmd_callback, 10)
+        self.create_subscription(String, '/truck_cmd', self.cmd_callback, 10)
         
-        # --- FÍSICA CAMIÓN ---
+        # --- ESTADO DEL CAMIÓN ---
         self.truck_x = -15.0 
         self.velocidad = 0.0
         self.dt = 0.05        
         
-        # Dimensiones del camión (Hitbox)
-        self.L_CHASIS = 13.5
-        self.W_CHASIS = 2.4
-        self.H_CHASIS = 1.2
-        self.CABIN_START = 10.0 # Metros desde la cola
-        self.H_CABIN = 3.0
-        self.W_CABIN = 2.5
+        # --- CONFIGURACIÓN DE SENSORES (EXACTA AL VISUALIZADOR) ---
+        # Si cambias algo aquí, cámbialo en el visualizador también.
+        self.S1_POS = [-10.2, 11.19, 12.5] # Estructura
+        self.S2_POS = [10.2, 0.0, 12.5]    # Longitudinal
         
-        # --- CONFIGURACIÓN DE SENSORES (EXACTA A TU PEDIDO) ---
-        # NOTA: Estas coordenadas son fijas en el mundo.
+        # --- DEFINICIÓN DE "CAJAS SÓLIDAS" (HITBOXES) ---
+        # Esto debe coincidir con: o3d.geometry.TriangleMesh.create_box en tu HMI
+        # Coordenadas LOCALES relativas al base_link del camión (X=0 es la cola)
         
-        # SENSOR 1: ESTRUCTURA (Desplazado en Y y X negativo)
-        self.S1_POS = [-10.2, 11.19, 12.5] 
+        # CHASIS (AZUL): create_box(13.5, 2.4, 1.2)
+        self.BOX_CHASIS = {
+            'x_min': 0.0, 'x_max': 13.5,
+            'y_min': -1.2, 'y_max': 1.2, # Centrado en Y
+            'z_top': 1.2
+        }
         
-        # SENSOR 2: LONGITUDINAL (Centrado en Y, X positivo)
-        self.S2_POS = [10.2, 0.0, 12.5]    
-        
+        # CABINA (ROJA): create_box(2.5, 2.5, 3.0) trasladada a X=10.0
+        self.BOX_CABINA = {
+            'x_min': 10.0, 'x_max': 12.5,
+            'y_min': -1.25, 'y_max': 1.25,
+            'z_top': 3.0
+        }
+
         self.timer = self.create_timer(self.dt, self.update_simulation)
-        self.get_logger().info(">>> SIMULADOR FISICO INICIADO CON NUEVAS COORDENADAS <<<")
+        self.get_logger().info(">>> SIMULADOR: HITBOXES SINCRONIZADAS CON 3D <<<")
 
     def cmd_callback(self, msg):
         if msg.data == "FORWARD": self.velocidad = 2.0
         elif msg.data == "BACKWARD": self.velocidad = -2.0
-        else: self.velocidad = 0.0
+        elif msg.data == "STOP": self.velocidad = 0.0
 
-    def get_hit_height(self, x_world, y_world):
-        """ Retorna la altura del objeto en una coordenada X,Y del mundo """
-        # Convertir a coordenadas locales del camión
+    def raycast_vertical(self, x_world, y_world, z_sensor):
+        """
+        Simula un rayo cayendo verticalmente (o inclinado) sobre el camión.
+        Retorna la DISTANCIA REAL de impacto desde el sensor.
+        """
+        # 1. Transformar X,Y mundial a coordenadas locales del camión
         x_local = x_world - self.truck_x
         y_local = y_world # Asumimos camión centrado en Y=0
         
-        # Verificar si está dentro del largo del camión
-        if 0 <= x_local <= self.L_CHASIS:
-            # Verificar zona Cabina
-            if x_local >= self.CABIN_START:
-                if abs(y_local) <= (self.W_CABIN / 2.0):
-                    return self.H_CABIN
-            # Verificar zona Chasis
-            else:
-                if abs(y_local) <= (self.W_CHASIS / 2.0):
-                    return self.H_CHASIS
-        return 0.0 # Suelo
+        altura_impacto = 0.0 # Por defecto: Suelo
+        
+        # 2. Chequear colisión con CABINA (Prioridad porque es más alta)
+        if (self.BOX_CABINA['x_min'] <= x_local <= self.BOX_CABINA['x_max']) and \
+           (self.BOX_CABINA['y_min'] <= y_local <= self.BOX_CABINA['y_max']):
+            altura_impacto = self.BOX_CABINA['z_top']
+            
+        # 3. Si no, chequear colisión con CHASIS
+        elif (self.BOX_CHASIS['x_min'] <= x_local <= self.BOX_CHASIS['x_max']) and \
+             (self.BOX_CHASIS['y_min'] <= y_local <= self.BOX_CHASIS['y_max']):
+            altura_impacto = self.BOX_CHASIS['z_top']
+            
+        return altura_impacto
 
     def simular_lidar_estructura(self):
-        """ 
-        Simula el sensor en [-10.2, 11.19, 12.5]. 
-        Al tener Pitch -90 y Roll 0, escanea en el plano Y-Z del mundo.
-        """
+        """ SENSOR 1: Simula barrido en Y (Ancho) """
         msg = LaserScan()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = 'sensor_estructura_link'
+        msg.header.frame_id = 'sensor_estruc_link'
+        msg.angle_min = np.radians(-55.0); msg.angle_max = np.radians(55.0)
+        msg.range_min = 0.1; msg.range_max = 70.0
+        msg.angle_increment = (msg.angle_max - msg.angle_min) / 99
+        msg.ranges = []
         
-        # Configuración angular (Tuya: -55 a 55)
-        msg.angle_min = np.radians(-55.0)
-        msg.angle_max = np.radians(55.0)
-        msg.range_min = 0.1
-        msg.range_max = 70.0
-        num_points = 100
-        msg.angle_increment = (msg.angle_max - msg.angle_min) / (num_points - 1)
+        sensor_x, sensor_y, sensor_z = self.S1_POS
         
-        ranges = []
-        for i in range(num_points):
+        for i in range(100):
             angle = msg.angle_min + i * msg.angle_increment
             
-            # Matemática de Raycast:
-            # El sensor barre en Y. 
-            # dy = Altura * tan(angle). 
-            # El ángulo 0 apunta directo abajo (Z-). Ángulo positivo va hacia Y- (izquierda del sensor).
+            # Trigonometría: El láser viaja lateralmente
+            # tan(angle) = dy / dz
+            dy = sensor_z * math.tan(angle)
             
-            # Proyección al suelo
-            dist_suelo_h = self.S1_POS[2] * math.tan(angle)
+            # Punto donde el rayo tocaría el suelo
+            target_y = sensor_y - dy # Invertimos signo según orientación
+            target_x = sensor_x      # En este sensor X no cambia
             
-            # Coordenada Y donde el rayo toca el suelo
-            # Nota: Dependiendo de la rotación del sensor, ajustamos el signo.
-            # Asumimos que angulo positivo barre hacia el centro (Y=0).
-            y_target = self.S1_POS[1] - dist_suelo_h 
-            x_target = self.S1_POS[0] # En este sensor X es fijo en el barrido
+            h_obj = self.raycast_vertical(target_x, target_y, sensor_z)
             
-            # Chequear colisión
-            h_obj = self.get_hit_height(x_target, y_target)
+            # Cálculo de Hipotenusa exacta al punto de impacto
+            cateto_z = sensor_z - h_obj
+            distancia = cateto_z / math.cos(angle)
+            msg.ranges.append(abs(distancia) + np.random.normal(0, 0.01))
             
-            if h_obj > 0:
-                # Hipotenusa ajustada a la nueva altura
-                cateto_v = self.S1_POS[2] - h_obj
-                dist = cateto_v / math.cos(angle)
-            else:
-                # Distancia al suelo
-                dist = self.S1_POS[2] / math.cos(angle)
-            
-            # Ruido
-            dist += np.random.normal(0, 0.02)
-            ranges.append(dist)
-            
-        msg.ranges = ranges
         return msg
 
     def simular_lidar_longitudinal(self):
-        """
-        Simula el sensor en [10.2, 0.0, 12.5].
-        Con Roll 90, escanea en el plano X-Z del mundo.
-        """
+        """ SENSOR 2: Simula barrido en X (Largo) - EL AMARILLO """
         msg = LaserScan()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = 'sensor_longitudinal_link'
+        msg.header.frame_id = 'sensor_long_link'
+        msg.angle_min = np.radians(-95.0); msg.angle_max = np.radians(0.0)
+        msg.range_min = 0.1; msg.range_max = 40.0
+        msg.angle_increment = (msg.angle_max - msg.angle_min) / 99
+        msg.ranges = []
         
-        # Configuración angular (Tuya: -95 a 0)
-        msg.angle_min = np.radians(-95.0)
-        msg.angle_max = np.radians(0.0)
-        msg.range_min = 0.1
-        msg.range_max = 20.0
-        num_points = 100
-        msg.angle_increment = (msg.angle_max - msg.angle_min) / (num_points - 1)
-
-        ranges = []
-        for i in range(num_points):
+        sensor_x, sensor_y, sensor_z = self.S2_POS
+        
+        for i in range(100):
             angle = msg.angle_min + i * msg.angle_increment
             
-            # Raycast en X (Longitudinal)
-            # Como angle va de -95 a 0, tan(angle) es negativo (hacia atrás)
-            dx = self.S2_POS[2] * math.tan(angle)
-            
-            x_target = self.S2_POS[0] + dx # + porque tan es negativo y miramos hacia atras
-            y_target = self.S2_POS[1]      # Fijo en 0
-            
-            # Evitar disparar al cielo (Angulos > -pi/2 muy cerca)
-            if angle < -1.55: 
-                ranges.append(0.0)
+            # PROTECCIÓN: Si el ángulo apunta hacia arriba o horizonte infinito
+            if angle > -0.05 or angle < -1.6: 
+                msg.ranges.append(0.0)
                 continue
 
-            h_obj = self.get_hit_height(x_target, y_target)
+            # Trigonometría Longitudinal: tan(angle) = dx / dz
+            # Como angle es negativo (-90 a 0), tan es negativa (hacia atrás)
+            dx = sensor_z * math.tan(angle)
             
-            if h_obj > 0:
-                cateto_v = self.S2_POS[2] - h_obj
-                dist = cateto_v / math.cos(angle)
-            else:
-                dist = self.S2_POS[2] / math.cos(angle)
+            # Punto donde tocaría el suelo
+            target_x = sensor_x + dx # dx ya es negativo
+            target_y = sensor_y      # Centrado
             
-            dist = abs(dist) + np.random.normal(0, 0.02)
-            ranges.append(dist)
+            h_obj = self.raycast_vertical(target_x, target_y, sensor_z)
             
-        msg.ranges = ranges
+            # LA MAGIA: Calcular distancia REAL al objeto, no al suelo
+            cateto_z = sensor_z - h_obj
+            
+            # Si h_obj > 0, el rayo choca antes. Recalculamos.
+            distancia = cateto_z / math.cos(angle)
+            
+            msg.ranges.append(abs(distancia) + np.random.normal(0, 0.01))
+            
         return msg
 
     def update_simulation(self):
-        # 1. Mover Camión
         self.truck_x += self.velocidad * self.dt
         
-        # 2. Publicar TF
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = 'map'
@@ -177,7 +158,6 @@ class TruckSimulator(Node):
         t.transform.rotation.w = 1.0
         self.tf_broadcaster.sendTransform(t)
         
-        # 3. Publicar Sensores
         self.pub_scan_estruc.publish(self.simular_lidar_estructura())
         self.pub_scan_long.publish(self.simular_lidar_longitudinal())
 

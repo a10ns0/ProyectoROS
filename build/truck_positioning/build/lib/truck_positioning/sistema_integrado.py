@@ -40,7 +40,7 @@ class SistemaControlPortuario(Node):
             'pos': [-5.0, 10.2, 12.0], # Ubicado lateralmente, centrado en Y
             'dist_min': 0.1, 'dist_max': 30.0, 
             'ang_min': -45, 'ang_max': 180, 
-            'pitch': np.radians(-90), 'yaw': np.radians(90), 'roll': 0
+            'pitch': np.radians(0), 'yaw': np.radians(-90), 'roll': 90
         }
         
         # Sensor 2 (Longitudinal): Ubicado al FINAL del carril (X=22.38), mirando hacia la entrada (X=0)
@@ -48,7 +48,7 @@ class SistemaControlPortuario(Node):
             'pos': [22.38, 10.2, 4.0], # En el fondo, altura media
             'dist_min': 0.1, 'dist_max': 50.0, 
             'ang_min': -90, 'ang_max': 90, 
-            'pitch': np.radians(0), 'yaw': np.radians(180), 'roll': 0 # Mirando hacia atrás
+            'pitch': np.radians(-90), 'yaw': np.radians(180), 'roll': 0 # Mirando hacia atrás
         }
 
         # ==========================================
