@@ -3,6 +3,8 @@ import requests
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+#COMPARACION DE RENDIMIENTO PERSISTENTE VS NO PERSISTENTE
 # CONFIGURACIÓN
 IP = "192.168.1.88"
 PORT = "8000"
