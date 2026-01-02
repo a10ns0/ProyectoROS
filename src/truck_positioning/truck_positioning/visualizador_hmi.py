@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import String, Float64 # <--- IMPORT AGREGADO
+from std_msgs.msg import String
 from tf2_ros import Buffer
 from tf2_ros.transform_listener import TransformListener
 import open3d as o3d
@@ -95,11 +95,6 @@ class SistemaLogicaPLC(Node):
         self.create_subscription(LaserScan, '/scan_estructura', self.cb_estructura, 10)
         self.pub_cmd = self.create_publisher(String, '/truck_cmd', 10)
         
-
-        # === NUEVO: CANALES PARA PLOTJUGGLER / RQT_PLOT ===
-        self.pub_distancia_graph = self.create_publisher(Float64, '/tps/debug/posicion_x', 10)
-        self.pub_error_graph     = self.create_publisher(Float64, '/tps/debug/error_m', 10)
-
         self.puntos_long = np.zeros((0, 3))
         self.puntos_estruc = np.zeros((0, 3))
         self.new_data = False
@@ -228,49 +223,27 @@ class SistemaLogicaPLC(Node):
                 print("   ¡ALERTA! El sensor envía datos pero TU CÓDIGO LOS BORRA TODOS.")
                 print("   Revisa: dist_min/max o ang_min/max en CFG_ESTRUC")
             print("-------------------------------")
-
-
-
-
-
     def evaluar_semaforo(self):
-            if self.posicion_detectada is None:
-                self.box_target.color = [1, 0, 0] 
-                return
+        if self.posicion_detectada is None:
+            self.box_target.color = [1, 0, 0] 
+            return
 
-            # 1. Calculamos el centro de la meta actual
-            centro_meta_x = (self.zona_target['min'][0] + self.zona_target['max'][0]) / 2.0
-            
-            # 2. Calculamos el error CON SIGNO (para saber si está adelante o atrás en la gráfica)
-            error_con_signo = self.posicion_detectada - centro_meta_x
-            error_absoluto = abs(error_con_signo)
-            
-            # === NUEVO: PUBLICAR PARA GRAFICA ===
-            # Enviamos la posición actual X
-            msg_pos = Float64()
-            msg_pos.data = float(self.posicion_detectada)
-            self.pub_distancia_graph.publish(msg_pos)
+        centro_meta_x = (self.zona_target['min'][0] + self.zona_target['max'][0]) / 2.0
+        error = abs(self.posicion_detectada - centro_meta_x)
+        
+        # Feedback en Terminal
+        if time.time() - self.ultimo_debug > 1.0:
+            status_str = f"Modo: {self.modo_operacion} ({self.db_spreader_size}')"
+            print(f"[{status_str}] Obj detectado a {self.posicion_detectada:.3f}m | Error: {error:.3f}m")
+            self.ultimo_debug = time.time()
 
-            # Enviamos el error (Asi ves en la gráfica como se acerca a 0)
-            msg_err = Float64()
-            msg_err.data = float(error_con_signo)
-            self.pub_error_graph.publish(msg_err)
-            # ====================================
-
-            # Feedback en Terminal (Tu código original)
-            if time.time() - self.ultimo_debug > 1.0:
-                status_str = f"Modo: {self.modo_operacion} ({self.db_spreader_size}')"
-                print(f"[{status_str}] Obj: {self.posicion_detectada:.3f}m | Target: {centro_meta_x:.3f}m | Error: {error_con_signo:.3f}m")
-                self.ultimo_debug = time.time()
-
-            # Lógica de colores (Usa el absoluto)
-            TOLERANCIA = 0.5 * self.SCALE 
-            if error_absoluto <= TOLERANCIA:
-                self.box_target.color = [0, 1, 0] # VERDE
-            elif error_absoluto <= (TOLERANCIA * 4):
-                self.box_target.color = [1, 1, 0] # AMARILLO
-            else:
-                self.box_target.color = [1, 0, 0] # ROJO
+        TOLERANCIA = 0.5 * self.SCALE 
+        if error <= TOLERANCIA:
+            self.box_target.color = [0, 1, 0] # VERDE
+        elif error <= (TOLERANCIA * 4):
+            self.box_target.color = [1, 1, 0] # AMARILLO
+        else:
+            self.box_target.color = [1, 0, 0] # ROJO
 
     # ==========================================
     # UTILIDADES MATEMÁTICAS
