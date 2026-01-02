@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import String, Float64
+from std_msgs.msg import String, Float64 # <--- IMPORT AGREGADO
 from tf2_ros import Buffer
 from tf2_ros.transform_listener import TransformListener
 import open3d as o3d
@@ -99,7 +99,6 @@ class SistemaLogicaPLC(Node):
         # === NUEVO: CANALES PARA PLOTJUGGLER / RQT_PLOT ===
         self.pub_distancia_graph = self.create_publisher(Float64, '/tps/debug/posicion_x', 10)
         self.pub_error_graph     = self.create_publisher(Float64, '/tps/debug/error_m', 10)
-
 
         self.puntos_long = np.zeros((0, 3))
         self.puntos_estruc = np.zeros((0, 3))
@@ -229,9 +228,11 @@ class SistemaLogicaPLC(Node):
                 print("   ¡ALERTA! El sensor envía datos pero TU CÓDIGO LOS BORRA TODOS.")
                 print("   Revisa: dist_min/max o ang_min/max en CFG_ESTRUC")
             print("-------------------------------")
-    
-    
-    ##MODIFICADO
+
+
+
+
+
     def evaluar_semaforo(self):
             if self.posicion_detectada is None:
                 self.box_target.color = [1, 0, 0] 
