@@ -1,5 +1,6 @@
 [console_scripts]
 cliente_API = truck_positioning.cliente_API:main
+integrado = truck_positioning.sistema_integrado.py:main
 lector = truck_positioning.ejemplo:main
 logic_node = truck_positioning.logic_node:main
 simple_truck_sim = truck_positioning.simple_truck_sim:main
