@@ -21,7 +21,7 @@ class GruaFullStateClient(Node):
 
         
         # Timeout seguro para redes inestables
-        self.timeout_requests = 0.5
+        self.timeout_requests = 1
         
         self.timer_period = 0.5 
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
