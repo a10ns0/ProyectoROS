@@ -62,8 +62,8 @@ class SistemaHMI_Profesional(Node):
         self.CFG_LONG = {
             'pos': [self.X_SENSOR, 0.0, self.Z_SENSOR], 
             'dist_min': 0.05, 'dist_max': 40 * self.SCALE,
-            'ang_min': -90.0, 'ang_max': 90.0, 
-            'pitch': np.radians(0), 'yaw': np.radians(180), 'roll': np.radians(90)
+            'ang_min': -90.0, 'ang_max': 0, 
+            'pitch': np.radians(0), 'yaw': np.radians(-90), 'roll': np.radians(90)
         }
         
         self.CFG_ESTRUC = {

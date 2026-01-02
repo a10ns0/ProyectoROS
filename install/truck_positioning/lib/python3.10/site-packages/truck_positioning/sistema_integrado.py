@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import String
+from std_msgs.msg import String, Float64 ##AGREGAR
 import open3d as o3d
 import numpy as np
 import threading
@@ -71,6 +71,10 @@ class SistemaControlPortuario(Node):
         self.create_subscription(LaserScan, '/scan_distancia', self.callback_longitudinal, 10)
         self.create_subscription(LaserScan, '/scan_estructura', self.callback_estructura, 10)
 
+        ## NUEVOS PUBLISHERS
+        self.pub_distancia = self.create_publisher(Float64,'/tps/distancia_real', 10)
+        self.pub_distancia = self.create_publisher(Float64,'/tps/error_posicion', 10)
+        
         # Variables Visualización
         self.puntos_long = np.zeros((0, 3))
         self.puntos_estruc = np.zeros((0, 3))
@@ -158,7 +162,17 @@ class SistemaControlPortuario(Node):
             
             self.distancia_medida = lectura_sensor
             self.error_distancia = self.distancia_medida - self.distancia_target
-            
+
+            ##AGREGAR####################################
+            msg_dist = Float64()
+            msg_dist.data = float(self.distancia_medida)
+            self.pub_distancia.publish(msg_dist)
+
+            msg_err = Float64()
+            msg_err.data = float(self.error_distancia)
+            self.pub_error.publish(msg_err)
+            ###########################################
+
             # Semáforo
             tolerancia = 0.20 # 20 cm de precisión
             
