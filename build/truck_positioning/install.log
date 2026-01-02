@@ -4,6 +4,7 @@
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/sub_BD.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_amarillo.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/logic_node.py
+/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/vision_PC.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_propio.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/monitor_dual.py
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/visualizador_perfil.py
@@ -18,6 +19,7 @@
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/sub_BD.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/visualizador_amarillo.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/logic_node.cpython-310.pyc
+/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/vision_PC.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/visualizador_propio.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/monitor_dual.cpython-310.pyc
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/python3.10/site-packages/truck_positioning/__pycache__/visualizador_perfil.cpython-310.pyc
@@ -52,5 +54,6 @@
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/simple_truck_sim
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/sistema_integrado
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/sub_BD
+/home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/vision_PC
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/visualizador
 /home/nuc/Documentos/GitHub/ProyectoROS/install/truck_positioning/lib/truck_positioning/visualizador_amarillo

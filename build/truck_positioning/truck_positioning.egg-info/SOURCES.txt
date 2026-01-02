@@ -28,6 +28,7 @@ truck_positioning/monitor_dual.py
 truck_positioning/simple_truck_sim.py
 truck_positioning/sistema_integrado.py
 truck_positioning/sub_BD.py
+truck_positioning/vision_PC.py
 truck_positioning/visualizador_amarillo.py
 truck_positioning/visualizador_hmi.py
 truck_positioning/visualizador_perfil.py
