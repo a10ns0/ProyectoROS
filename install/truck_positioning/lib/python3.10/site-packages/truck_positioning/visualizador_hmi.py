@@ -9,106 +9,98 @@ import numpy as np
 import threading
 import time
 
-class SistemaMaquetaPro(Node):
+class SistemaValidacionCaja(Node):
     def __init__(self):
-        super().__init__('sistema_maqueta_pro')
+        super().__init__('sistema_validacion_caja')
         
         # =========================================================
-        # 1. CÁLCULO DE ESCALA (1.5 METROS DE SEPARACIÓN)
+        # 1. ESCALADO (1.5 METROS)
         # =========================================================
         DISTANCIA_REAL_ORIGINAL = 20.4
         DISTANCIA_MAQUETA = 1.5 
+        self.SCALE = DISTANCIA_MAQUETA / DISTANCIA_REAL_ORIGINAL # aprox 0.0735
         
-        # Factor de Escala (~0.0735)
-        self.SCALE = DISTANCIA_MAQUETA / DISTANCIA_REAL_ORIGINAL
+        # =========================================================
+        # 2. CALIBRACIÓN PARA TU CAJA (23 x 19.5 x 19.5 cm)
+        # =========================================================
+        # ANCHO: Tu caja tiene 19.5cm. Pedimos mínimo 15cm para validarla.
+        self.MIN_ANCHO_CAMION = 2.0 * self.SCALE # ~14.7 cm
         
-        # LÍMITE CRÍTICO: 1.7 Metros Reales escalados a la maqueta
-        # Si la escala es 0.07, esto será aprox 12.5 cm de alto en tu mesa
-        self.ALTURA_MAX_CHASIS = 1.7 * self.SCALE 
+        # ALTO MÍNIMO PARA VALIDAR PERFIL (Sensor Azul)
+        # Tu caja tiene 19.5cm. Pedimos mínimo 10cm.
+        self.MIN_ALTO_CAMION  = 1.3 * self.SCALE # ~9.5 cm
         
-        print("="*60)
-        print(f"=== SISTEMA STS MAQUETA PRO (Separación 1.5m) ===")
-        print(f"Escala calculada: {self.SCALE:.4f}")
-        print(f"Altura de corte (Chasis vs Contenedor): {self.ALTURA_MAX_CHASIS*100:.1f} cm")
-        print("="*60)
+        # --- FILTROS DE LÓGICA (CARGA VS DESCARGA) ---
+        # AQUI ESTA EL CAMBIO CLAVE PARA TU CAJA:
+        # Definimos que un "Contenedor" en tu maqueta es algo mayor a 18cm.
+        # Como tu caja mide 19.5cm, pasará el filtro.
+        
+        self.H_FILTRO_CONTENEDOR   = 2.45 * self.SCALE  # ~18.0 cm (Tu caja mide 19.5 -> OK)
+        
+        # Para chasis vacío, buscamos cosas más bajas (ej: un celular de lado, < 13cm)
+        self.H_FILTRO_CHASIS_HIGH  = 1.8 * self.SCALE   # ~13.2 cm
+        self.H_FILTRO_CHASIS_LOW   = 0.5 * self.SCALE   # ~3.6 cm
+
+        print(f"=== CALIBRACIÓN CAJA (Escala {self.SCALE:.4f}) ===")
+        print(f"OBJETIVO: Detectar caja de 19.5cm de alto como CONTENEDOR")
+        print(f" > Filtro Contenedor: > {self.H_FILTRO_CONTENEDOR*100:.1f} cm")
+        print(f" > Filtro Chasis: Entre {self.H_FILTRO_CHASIS_LOW*100:.1f} y {self.H_FILTRO_CHASIS_HIGH*100:.1f} cm")
 
         # =========================================================
-        # 2. DEFINICIÓN DE ZONAS (20 y 40 Pies)
+        # 3. ZONAS Y LÓGICA (Igual que antes)
         # =========================================================
-        self.DB_GEOMETRIA = {
-            '40': { 
-                'min': [-6.0*self.SCALE, -1.2*self.SCALE, 0.0], 
-                'max': [ 6.0*self.SCALE,  1.2*self.SCALE, 4.5*self.SCALE], 
-                'desc': "40 PIES"
-            },
-            '20': { 
-                'min': [-3.0*self.SCALE, -1.2*self.SCALE, 0.0], 
-                'max': [ 3.0*self.SCALE,  1.2*self.SCALE, 4.5*self.SCALE], 
-                'desc': "20 PIES"
-            }
-        }
-        
-        # Estado Inicial
-        self.modo_tamano = '40'
-        self.modo_tipo   = 'CHASIS' # 'CHASIS' (Vacío) o 'CONTENEDOR' (Lleno)
-        self.zona_target = self.DB_GEOMETRIA['40']
-        
-        self.posicion_x_camion = None
+        self.perfil_ok = False          
+        self.posicion_detectada = None
+        self.db_twistlocks = 'CLOSE' 
+        self.modo_operacion = 'DESCARGA_DEL_BARCO' 
         self.ultimo_debug = 0
 
-        # =========================================================
-        # 3. CONFIGURACIÓN DE SENSORES
-        # =========================================================
-        # SENSOR 2 (Longitudinal) - DERECHA
-        self.CFG_LONG = {
-            'pos': [10.2 * self.SCALE, 0.0, 12.5 * self.SCALE], 
-            'dist_min': 0.05, 'dist_max': 40 * self.SCALE,
-            'ang_min': -90.0, 'ang_max': 90.0, 
-            'pitch': np.radians(0), 
-            'yaw': np.radians(180), 
-            'roll': np.radians(90)
+        self.DB_GEOMETRIA = {
+            '40': { 'min': [-6.0*self.SCALE, -1.2*self.SCALE, 0.0], 'max': [ 6.0*self.SCALE,  1.2*self.SCALE, 5.0*self.SCALE] }
+        }
+        self.zona_target = self.DB_GEOMETRIA['40']
+        
+        self.ZONA_PERFIL = {
+            'min': [-11.0*self.SCALE, -2.5*self.SCALE, 0.0], 
+            'max': [ -9.0*self.SCALE,  2.5*self.SCALE, 5.0*self.SCALE]
         }
 
-        # SENSOR 1 (Estructura) - IZQUIERDA
+        # Configuración Sensores
+        self.Z_SENSOR = 12.5 * self.SCALE
+        self.X_SENSOR = 10.2 * self.SCALE 
+
+        self.CFG_LONG = {
+            'pos': [self.X_SENSOR, 0.0, self.Z_SENSOR], 
+            'dist_min': 0.05, 'dist_max': 40 * self.SCALE,
+            'ang_min': -90.0, 'ang_max': 90.0, 
+            'pitch': np.radians(0), 'yaw': np.radians(180), 'roll': np.radians(90)
+        }
+        
         self.CFG_ESTRUC = {
-            'pos': [-10.2 * self.SCALE, 11.19 * self.SCALE, 12.5 * self.SCALE],
-            'dist_min': 0.05, 'dist_max': 70 * self.SCALE,
+            'pos': [-self.X_SENSOR, 11.19*self.SCALE, self.Z_SENSOR],
+            'dist_min': 0.05, 'dist_max': 40 * self.SCALE,
             'ang_min': -45.0, 'ang_max': 45.0,
             'pitch': np.radians(-90), 'yaw': np.radians(180), 'roll': np.radians(0)
         }
 
-        # Camión Virtual
-        self.truck_x_virtual = -15.0 * self.SCALE 
-
-        # ROS Setup
         self.create_subscription(LaserScan, '/scan_distancia', self.cb_longitudinal, 10)
         self.create_subscription(LaserScan, '/scan_estructura', self.cb_estructura, 10)
-        self.pub_cmd = self.create_publisher(String, '/truck_cmd', 10)
         
         self.puntos_long = np.zeros((0, 3))
         self.puntos_estruc = np.zeros((0, 3))
         self.new_data = False
-        self.actualizar_caja = False
-        
         self.init_gui()
         self.running = True
 
     def init_gui(self):
         self.vis = o3d.visualization.VisualizerWithKeyCallback()
-        self.vis.create_window("CONTROL MAQUETA STS", 1280, 720)
+        self.vis.create_window("SISTEMA MAQUETA", 1280, 720)
         self.vis.get_render_option().point_size = 5.0
 
-        # --- CONTROLES TECLADO ---
-        self.vis.register_key_callback(ord("1"), lambda v: self.set_tamano('20'))
-        self.vis.register_key_callback(ord("2"), lambda v: self.set_tamano('40'))
-        self.vis.register_key_callback(ord("V"), lambda v: self.set_tipo('CHASIS'))     # Vacío
-        self.vis.register_key_callback(ord("C"), lambda v: self.set_tipo('CONTENEDOR')) # Con Carga
-        
-        # Mover camión virtual (Referencia)
-        self.vis.register_key_callback(ord("W"), lambda v: self.mover_camion(0.05))
-        self.vis.register_key_callback(ord("S"), lambda v: self.mover_camion(-0.05))
+        self.vis.register_key_callback(ord("T"), self.toggle_twistlock)
+        self.vis.register_key_callback(ord("R"), self.reset_sistema)
+        self.vis.register_key_callback(ord("B"), self.teletransportar_a_azul)
 
-        # --- VISUALIZACIÓN ---
         self.pcd_long = o3d.geometry.PointCloud()
         self.pcd_estruc = o3d.geometry.PointCloud()
 
@@ -116,181 +108,157 @@ class SistemaMaquetaPro(Node):
             min_bound=np.array(self.zona_target['min']), max_bound=np.array(self.zona_target['max']))
         self.box_target.color = [1, 0, 0]
 
-        self.vis.add_geometry(self.box_target)
+        self.box_profile = o3d.geometry.AxisAlignedBoundingBox(
+            min_bound=np.array(self.ZONA_PERFIL['min']), max_bound=np.array(self.ZONA_PERFIL['max']))
+        self.box_profile.color = [0, 0, 1] 
+
+        # Referencias Visuales (Lineas de altura)
+        self.vis.add_geometry(self.crear_referencia_altura(self.H_FILTRO_CHASIS_HIGH, [1, 1, 0])) # Amarillo (Chasis)
+        self.vis.add_geometry(self.crear_referencia_altura(self.H_FILTRO_CONTENEDOR, [0, 1, 1]))  # Cyan (Contenedor)
+
+        self.vis.add_geometry(self.box_target); self.vis.add_geometry(self.box_profile)
         self.vis.add_geometry(self.crear_suelo_escalado()) 
-        self.vis.add_geometry(self.pcd_long)
-        self.vis.add_geometry(self.pcd_estruc)
+        self.vis.add_geometry(self.pcd_long); self.vis.add_geometry(self.pcd_estruc)
         
-        # Esferas Sensores
         s1 = o3d.geometry.TriangleMesh.create_sphere(radius=0.3 * self.SCALE)
         s1.translate(self.CFG_LONG['pos']); s1.paint_uniform_color([1, 0.5, 0])
         s2 = o3d.geometry.TriangleMesh.create_sphere(radius=0.3 * self.SCALE)
         s2.translate(self.CFG_ESTRUC['pos']); s2.paint_uniform_color([0, 1, 1])
         self.vis.add_geometry(s1); self.vis.add_geometry(s2)
 
-        # Camión 3D
-        self.camion_mesh = self.crear_camion_urdf()
-        self.vis.add_geometry(self.camion_mesh)
-
-        # Texto de estado en consola
-        print("\nCONTROLES ACTIVOS:")
-        print("[1] 20 Pies  | [2] 40 Pies")
-        print("[V] Chasis Vacío (< 1.7m) | [C] Contenedor (> 1.7m)")
-        print("[W/S] Mover Camión Virtual\n")
-
         ctr = self.vis.get_view_control()
         ctr.set_lookat([0,0,0]); ctr.set_front([0.0, -0.5, 0.8]); ctr.set_zoom(0.25)
 
-    # ==========================================
-    # LÓGICA DE FILTRADO (LA CLAVE)
-    # ==========================================
-    def cb_longitudinal(self, msg):
-        points = self.laser_to_xyz(msg, self.CFG_LONG)
-        self.puntos_long = points
-        
-        # 1. Filtro Espacial (Solo lo que está en la "calle")
-        ancho_calle = 3.5 * self.SCALE
-        mask_calle = (points[:,1] > -ancho_calle) & (points[:,1] < ancho_calle)
-        
-        # 2. Filtro de Altura según MODO (Chasis vs Contenedor)
-        # Z > 0.02 evita el suelo de la mesa
-        if self.modo_tipo == 'CHASIS':
-            # Buscamos objetos BAJOS (Menor a 1.7m real escalado)
-            mask_altura = (points[:,2] > 0.02) & (points[:,2] < self.ALTURA_MAX_CHASIS)
-        else:
-            # Buscamos objetos ALTOS (Mayor a 1.7m real escalado)
-            mask_altura = (points[:,2] >= self.ALTURA_MAX_CHASIS)
-
-        # Aplicamos ambos filtros
-        mask_total = mask_calle & mask_altura
-        pts_validos = points[mask_total]
-
-        if len(pts_validos) > 5:
-            self.posicion_x_camion = np.mean(pts_validos[:,0])
-        else:
-            self.posicion_x_camion = None
-
-        self.evaluar_semaforo()
-        self.new_data = True
+    def reset_sistema(self, vis):
+        self.perfil_ok = False
+        self.box_profile.color = [0, 0, 1]
+        self.box_target.color = [1, 0, 0]
+        print(">>> SISTEMA RESETEADO")
 
     def cb_estructura(self, msg):
         points = self.laser_to_xyz(msg, self.CFG_ESTRUC)
         self.puntos_estruc = points
+        
+        if self.perfil_ok:
+            self.new_data = True
+            return
+
+        min_b = np.array(self.ZONA_PERFIL['min']); max_b = np.array(self.ZONA_PERFIL['max'])
+        mask_box = np.all((points >= min_b) & (points <= max_b), axis=1)
+        puntos_en_caja = points[mask_box]
+
+        if len(puntos_en_caja) > 10:
+            ancho_obj = np.max(puntos_en_caja[:,1]) - np.min(puntos_en_caja[:,1])
+            alto_obj  = np.max(puntos_en_caja[:,2]) - np.min(puntos_en_caja[:,2])
+            
+            # VALIDACIÓN: Usamos las medidas ajustadas a tu caja
+            es_camion = (ancho_obj > self.MIN_ANCHO_CAMION) and (alto_obj > self.MIN_ALTO_CAMION)
+            
+            if es_camion:
+                self.perfil_ok = True
+                self.box_profile.color = [0, 1, 1] 
+                print(f">>> [PERFIL OK] Caja detectada: {ancho_obj*100:.1f}cm x {alto_obj*100:.1f}cm")
+
+        self.new_data = True
+
+    def cb_longitudinal(self, msg):
+        points = self.laser_to_xyz(msg, self.CFG_LONG)
+        self.puntos_long = points
+        
+        if not self.perfil_ok:
+            self.posicion_detectada = None
+            self.evaluar_semaforo(); self.new_data = True; return
+
+        ancho_calle = 3.5 * self.SCALE
+        mask_calle = (points[:,1] > -ancho_calle) & (points[:,1] < ancho_calle)
+        mask_altura = None
+
+        if self.modo_operacion == 'CARGA_AL_BARCO':
+            mask_altura = (points[:,2] > self.H_FILTRO_CONTENEDOR)
+        elif self.modo_operacion == 'DESCARGA_DEL_BARCO':
+            mask_altura = (points[:,2] > self.H_FILTRO_CHASIS_LOW) & \
+                          (points[:,2] < self.H_FILTRO_CHASIS_HIGH)
+
+        pts_validos = points[mask_calle & mask_altura]
+
+        if len(pts_validos) > 5:
+            self.posicion_detectada = np.mean(pts_validos[:,0])
+        else:
+            self.posicion_detectada = None
+
+        self.evaluar_semaforo()
         self.new_data = True
 
     def evaluar_semaforo(self):
-        if self.posicion_x_camion is None:
-            self.box_target.color = [1, 0, 0] 
-            return
+        if not self.perfil_ok or self.posicion_detectada is None:
+            self.box_target.color = [1, 0, 0]; return
 
         centro_meta_x = (self.zona_target['min'][0] + self.zona_target['max'][0]) / 2.0
-        error = abs(self.posicion_x_camion - centro_meta_x)
+        error = abs(self.posicion_detectada - centro_meta_x)
         
-        # Debug en terminal
         if time.time() - self.ultimo_debug > 1.0:
-            modo_str = "VACIO (Buscando < 1.7m)" if self.modo_tipo == 'CHASIS' else "LLENO (Buscando > 1.7m)"
-            print(f"[{self.modo_tamano}' | {modo_str}] Pos: {self.posicion_x_camion:.3f}m | Error: {error:.3f}m")
+            print(f"Distancia: {self.posicion_detectada:.3f}m | Error: {error:.3f}m")
             self.ultimo_debug = time.time()
 
         TOLERANCIA = 0.5 * self.SCALE 
         if error <= TOLERANCIA:
-            self.box_target.color = [0, 1, 0] # VERDE
+            self.box_target.color = [0, 1, 0] 
         elif error <= (TOLERANCIA * 4):
-            self.box_target.color = [1, 1, 0] # AMARILLO
+            self.box_target.color = [1, 1, 0] 
         else:
-            self.box_target.color = [1, 0, 0] # ROJO
+            self.box_target.color = [1, 0, 0] 
 
-    # ==========================================
-    # HELPERS
-    # ==========================================
-    def set_tamano(self, t):
-        self.modo_tamano = t
-        self.zona_target = self.DB_GEOMETRIA[t]
-        self.box_target.min_bound = np.array(self.zona_target['min'])
-        self.box_target.max_bound = np.array(self.zona_target['max'])
-        self.actualizar_caja = True
-        print(f">>> MODO: {t} PIES")
+    def toggle_twistlock(self, vis):
+        if self.db_twistlocks == 'CLOSE':
+            self.db_twistlocks = 'OPEN'; self.modo_operacion = 'CARGA_AL_BARCO' 
+        else:
+            self.db_twistlocks = 'CLOSE'; self.modo_operacion = 'DESCARGA_DEL_BARCO' 
+        print(f">>> Twistlocks: {self.db_twistlocks} ({self.modo_operacion})")
+        return False
 
-    def set_tipo(self, t):
-        self.modo_tipo = t
-        print(f">>> MODO: CAMIÓN {t}")
+    def teletransportar_a_azul(self, vis):
+        ctr = self.vis.get_view_control(); ctr.set_lookat(self.CFG_ESTRUC['pos']); ctr.set_zoom(0.05); return False
 
-    def mover_camion(self, dx):
-        self.truck_x_virtual += dx
-        self.camion_mesh.translate([dx, 0, 0])
-        self.vis.update_geometry(self.camion_mesh)
-
-    def crear_camion_urdf(self):
-        chassis = o3d.geometry.TriangleMesh.create_box(width=12.0*self.SCALE, height=2.4*self.SCALE, depth=1.2*self.SCALE)
-        chassis.compute_vertex_normals(); chassis.paint_uniform_color([0.0, 0.0, 0.8])
-        chassis.translate(np.array([-6.0*self.SCALE, -1.2*self.SCALE, 0]))
-        
-        cabin = o3d.geometry.TriangleMesh.create_box(width=2.5*self.SCALE, height=2.4*self.SCALE, depth=3.0*self.SCALE)
-        cabin.compute_vertex_normals(); cabin.paint_uniform_color([0.8, 0.0, 0.0])
-        cabin.translate(np.array([-1.25*self.SCALE, -1.2*self.SCALE, -1.5*self.SCALE]))
-        cabin.translate(np.array([5.0*self.SCALE, 0, 1.5*self.SCALE]))
-
-        full_truck = chassis + cabin
-        full_truck.translate(np.array([self.truck_x_virtual, 0, 0.8*self.SCALE])) 
-        return full_truck
+    def laser_to_xyz(self, msg, cfg):
+        angles = np.arange(msg.angle_min, msg.angle_max, msg.angle_increment)
+        ranges = np.array(msg.ranges)
+        min_len = min(len(angles), len(ranges)); angles = angles[:min_len]; ranges = ranges[:min_len]
+        lim_min_rad = np.radians(cfg['ang_min']); lim_max_rad = np.radians(cfg['ang_max'])
+        valid = (ranges > cfg['dist_min']) & (ranges < cfg['dist_max']) & (angles >= lim_min_rad) & (angles <= lim_max_rad)
+        r = ranges[valid]; a = angles[valid]
+        if len(r) == 0: return np.zeros((0, 3))
+        x = r * np.cos(a); y = r * np.sin(a); z = np.zeros_like(x)
+        points = np.vstack((x, y, z)).T
+        R = o3d.geometry.get_rotation_matrix_from_xyz((cfg['roll'], cfg['pitch'], cfg['yaw']))
+        points = points @ R.T; points += np.array(cfg['pos'])
+        return points
 
     def crear_suelo_escalado(self):
-        size=40 * self.SCALE; step=2 * self.SCALE; points=[]; lines=[]
-        start=-size/2; count=int(size/step)+1
+        size=40*self.SCALE; step=2*self.SCALE; points=[]; lines=[]; start=-size/2; count=int(size/step)+1
         for i in range(count):
-            c=start+i*step
-            points.append([start,c,0]); points.append([-start,c,0]); lines.append([len(points)-2, len(points)-1])
+            c=start+i*step; points.append([start,c,0]); points.append([-start,c,0]); lines.append([len(points)-2, len(points)-1])
             points.append([c,start,0]); points.append([c,-start,0]); lines.append([len(points)-2, len(points)-1])
         ls=o3d.geometry.LineSet(); ls.points=o3d.utility.Vector3dVector(points)
         ls.lines=o3d.utility.Vector2iVector(lines); ls.colors=o3d.utility.Vector3dVector([[0.2,0.2,0.2]]*len(lines))
         return ls
 
-    def laser_to_xyz(self, msg, cfg):
-        angles = np.arange(msg.angle_min, msg.angle_max, msg.angle_increment)
-        ranges = np.array(msg.ranges)
-        min_len = min(len(angles), len(ranges))
-        angles = angles[:min_len]; ranges = ranges[:min_len]
-
-        lim_min_rad = np.radians(cfg['ang_min'])
-        lim_max_rad = np.radians(cfg['ang_max'])
-
-        valid = (ranges > cfg['dist_min']) & (ranges < cfg['dist_max']) & \
-                (angles >= lim_min_rad) & (angles <= lim_max_rad)
-
-        r = ranges[valid]; a = angles[valid]
-        if len(r) == 0: return np.zeros((0, 3))
-
-        x = r * np.cos(a); y = r * np.sin(a); z = np.zeros_like(x)
-        points = np.vstack((x, y, z)).T
-        
-        R = o3d.geometry.get_rotation_matrix_from_xyz((cfg['roll'], cfg['pitch'], cfg['yaw']))
-        points = points @ R.T
-        points += np.array(cfg['pos'])
-        return points
+    def crear_referencia_altura(self, z, color):
+        points = [[-5*self.SCALE, -2*self.SCALE, z], [ 5*self.SCALE, -2*self.SCALE, z],[-5*self.SCALE, 2*self.SCALE, z], [ 5*self.SCALE, 2*self.SCALE, z]]
+        lines = [[0,1], [1,3], [3,2], [2,0]]; ls = o3d.geometry.LineSet(); ls.points = o3d.utility.Vector3dVector(points); ls.lines = o3d.utility.Vector2iVector(lines); ls.paint_uniform_color(color); return ls
 
 def main():
     rclpy.init()
-    gui = SistemaMaquetaPro()
+    gui = SistemaValidacionCaja()
     t = threading.Thread(target=rclpy.spin, args=(gui,), daemon=True)
     t.start()
     try:
         while gui.running:
             if gui.new_data:
-                gui.pcd_long.points = o3d.utility.Vector3dVector(gui.puntos_long)
-                gui.pcd_long.paint_uniform_color([1, 0.5, 0]) 
-                gui.pcd_estruc.points = o3d.utility.Vector3dVector(gui.puntos_estruc)
-                gui.pcd_estruc.paint_uniform_color([0, 1, 1])
-                
-                gui.vis.update_geometry(gui.pcd_long)
-                gui.vis.update_geometry(gui.pcd_estruc)
-                gui.vis.update_geometry(gui.box_target)
-                
-                if gui.actualizar_caja:
-                    gui.vis.update_geometry(gui.box_target)
-                    gui.actualizar_caja = False
-                    
+                gui.pcd_long.points = o3d.utility.Vector3dVector(gui.puntos_long); gui.pcd_long.paint_uniform_color([1, 0.5, 0]) 
+                gui.pcd_estruc.points = o3d.utility.Vector3dVector(gui.puntos_estruc); gui.pcd_estruc.paint_uniform_color([0, 1, 1])
+                gui.vis.update_geometry(gui.pcd_long); gui.vis.update_geometry(gui.pcd_estruc)
+                gui.vis.update_geometry(gui.box_target); gui.vis.update_geometry(gui.box_profile)
                 gui.new_data = False
-            
             gui.vis.poll_events(); gui.vis.update_renderer(); time.sleep(0.01)
     except KeyboardInterrupt: pass
     finally: gui.vis.destroy_window(); rclpy.shutdown()
