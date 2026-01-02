@@ -31,6 +31,7 @@ setup(
             'truck_perception = truck_positioning.truck_perception:main',
             'truck_control = truck_positioning.truck_control:main',
             'simple_truck_sim = truck_positioning.simple_truck_sim:main',
+            'integrado = truck_positioning.sistema_integrado.py:main',
             
         ],
     },

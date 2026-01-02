@@ -13,8 +13,9 @@ test/test_copyright.py
 test/test_flake8.py
 test/test_pep257.py
 truck_positioning/__init__.py
-truck_positioning/cliente_API.py
+truck_positioning/cliente_API_noPersistente.py
+truck_positioning/sensores_reales.launch.py
 truck_positioning/simple_truck_sim.py
+truck_positioning/sistema_integrado.py
 truck_positioning/sub_BD.py
-truck_positioning/truck_control.py
-truck_positioning/truck_perception.py
+truck_positioning/test_rendimiento.py
