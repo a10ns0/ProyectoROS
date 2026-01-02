@@ -28,11 +28,11 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'logic_node = truck_positioning.logic_node:main',
-            'calibrador_sensores = truck_positioning.calibrador_sensores:main',
-            'visualizador = truck_positioning.visualizador_perfil:main',
-            'visualizador_amarillo = truck_positioning.visualizador_amarillo:main',
-            'monitor_dual = truck_positioning.monitor_dual:main',
+        'logic_node = truck_positioning.logic_node:main',
+        'calibrador_sensores = truck_positioning.calibrador_sensores:main',
+        'visualizador = truck_positioning.visualizador_perfil:main',
+        'visualizador_amarillo = truck_positioning.visualizador_amarillo:main',
+        'monitor_dual = truck_positioning.monitor_dual:main',
 	    'calculador_distancia = truck_positioning.calculador_distancia:main',
 	    'interfaz_camion = truck_positioning.interfaz_camion:main',
 	    'cliente_API = truck_positioning.cliente_API:main',
@@ -40,6 +40,8 @@ setup(
 	    'camion_3D = truck_positioning.open3d:main',
 	    'simple_truck_sim = truck_positioning.simple_truck_sim:main',
 	    'sistema_integrado = truck_positioning.sistema_integrado:main',
+        'vision_PC = truck_positioning.vision_PC:main',
+
         ],
     },
 )
