@@ -1,9 +1,9 @@
 [console_scripts]
 calculador_distancia = truck_positioning.calculador_distancia:main
+calibrador_sensores = truck_positioning.calibrador_sensores:main
 camion_3D = truck_positioning.open3d:main
 cliente_API = truck_positioning.cliente_API:main
 interfaz_camion = truck_positioning.interfaz_camion:main
-lector = truck_positioning.ejemplo:main
 logic_node = truck_positioning.logic_node:main
 monitor_dual = truck_positioning.monitor_dual:main
 simple_truck_sim = truck_positioning.simple_truck_sim:main

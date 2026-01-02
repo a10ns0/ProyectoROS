@@ -20,8 +20,8 @@ test/test_flake8.py
 test/test_pep257.py
 truck_positioning/__init__.py
 truck_positioning/calculador_distancia.py
+truck_positioning/calibrador_sensore.py
 truck_positioning/cliente_API.py
-truck_positioning/ejemplo.py
 truck_positioning/interfaz_camion.py
 truck_positioning/logic_node.py
 truck_positioning/monitor_dual.py

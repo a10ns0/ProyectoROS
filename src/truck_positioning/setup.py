@@ -29,7 +29,7 @@ setup(
     entry_points={
         'console_scripts': [
             'logic_node = truck_positioning.logic_node:main',
-            'lector = truck_positioning.ejemplo:main',
+            'calibrador_sensores = truck_positioning.calibrador_sensores:main',
             'visualizador = truck_positioning.visualizador_perfil:main',
             'visualizador_amarillo = truck_positioning.visualizador_amarillo:main',
             'monitor_dual = truck_positioning.monitor_dual:main',
