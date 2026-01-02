@@ -18,6 +18,8 @@ class GruaFullStateClient(Node):
         
         self.publisher_ = self.create_publisher(String, 'grua/estado_completo', 10)
         
+
+        
         # Timeout seguro para redes inestables
         self.timeout_requests = 0.5
         

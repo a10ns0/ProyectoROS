@@ -22,7 +22,7 @@ class GruaFullVisualizer(Node):
             # print("\033c", end="") 
             
             print("========================================")
-            print(f"   ESTADO GRÚA STS-001 (Recibido)      ")
+            print(f"   ESTADO GRÚA (Recibido)      ")
             print("========================================")
             
             # Extraemos los valores con seguridad (usando .get por si alguno viene null)
